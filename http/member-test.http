@@ -1,4 +1,6 @@
-GET http://localhost:8081/member/hello
+GET http://localhost:8082/member/hello
 Accept: application/json
 
 ###
+GET http://localhost:8000/member/hello
+Accept: application/json
