@@ -14,9 +14,16 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!--之所以只在common模块的pom中引入aop，是因为common模块的父pom，即项目根目录的pom中还引用spring-boot-starter-parent作为其父pom，在那个pom中已经定义了aop-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
+        <!--同aop模块，因为validation已经在spring-boot-starter-parent定义版本，所以这里不用再次定义-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
         <dependency>
