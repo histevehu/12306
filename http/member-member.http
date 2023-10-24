@@ -1,0 +1,3 @@
+# /member/member/count中第一个member是模块名，第二个member是数据表名，后跟操作名
+GET http://localhost:8000/member/member/count
+Accept: application/json
