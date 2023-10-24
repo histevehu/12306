@@ -1,16 +1,19 @@
-package com.jiawa.train.common.controller;
+package com.steve.train.common.controller;
 
-import com.jiawa.train.common.exception.BusinessException;
-import com.jiawa.train.common.resp.CommonResp;
+import com.steve.train.common.resp.CommonResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 统一异常处理、数据预处理等
+ * @ControllerAdvice 一般和三个以下注解一块使用，实现对业务异常进行统一处理
+ *
+ * @ExceptionHandler: 该注解作用于方法上，，可以捕获到controller中抛出的一些自定义异常，统一进行处理，一般用于进行一些特定的异常处理。
+ * @InitBinder: 该注解作用于方法上,用于将前端请求的特定类型的参数在到达controller之前进行处理，从而达到转换请求参数格式的目的。
+ * @ModelAttribute： 该注解作用于方法和请求参数上，在方法上时设置一个值，可以直接在进入controller后传入该参数。
  */
 @ControllerAdvice
 public class ControllerExceptionHandler {
@@ -19,13 +22,14 @@ public class ControllerExceptionHandler {
 
     /**
      * 所有异常统一处理
+     *
      * @param e
      * @return
      */
+    // @ExceptionHandler参数是某个异常类的class，代表这个方法专门处理该类异常，比如这样：
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
     public CommonResp exceptionHandler(Exception e) throws Exception {
-        // LOG.info("seata全局事务ID: {}", RootContext.getXID());
         // // 如果是在一次全局事务里出异常了，就不要包装返回值，将异常抛给调用方，让调用方回滚事务
         // if (StrUtil.isNotBlank(RootContext.getXID())) {
         //     throw e;
@@ -33,49 +37,8 @@ public class ControllerExceptionHandler {
         CommonResp commonResp = new CommonResp();
         LOG.error("系统异常：", e);
         commonResp.setSuccess(false);
-        commonResp.setMessage("系统出现异常，请联系管理员");
+        commonResp.setMessage(e.getMessage());
         return commonResp;
-    }
-
-    /**
-     * 业务异常统一处理
-     * @param e
-     * @return
-     */
-    @ExceptionHandler(value = BusinessException.class)
-    @ResponseBody
-    public CommonResp exceptionHandler(BusinessException e) {
-        CommonResp commonResp = new CommonResp();
-        LOG.error("业务异常：{}", e.getE().getDesc());
-        commonResp.setSuccess(false);
-        commonResp.setMessage(e.getE().getDesc());
-        return commonResp;
-    }
-
-    /**
-     * 校验异常统一处理
-     * @param e
-     * @return
-     */
-    @ExceptionHandler(value = BindException.class)
-    @ResponseBody
-    public CommonResp exceptionHandler(BindException e) {
-        CommonResp commonResp = new CommonResp();
-        LOG.error("校验异常：{}", e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
-        commonResp.setSuccess(false);
-        commonResp.setMessage(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
-        return commonResp;
-    }
-
-    /**
-     * 校验异常统一处理
-     * @param e
-     * @return
-     */
-    @ExceptionHandler(value = RuntimeException.class)
-    @ResponseBody
-    public CommonResp exceptionHandler(RuntimeException e) {
-        throw e;
     }
 
 }
