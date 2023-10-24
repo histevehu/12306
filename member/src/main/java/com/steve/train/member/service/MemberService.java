@@ -3,6 +3,7 @@ package com.steve.train.member.service;
 import com.steve.train.member.domain.Member;
 import com.steve.train.member.domain.MemberExample;
 import com.steve.train.member.mapper.MemberMapper;
+import com.steve.train.member.req.MemberRegisterReq;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +18,10 @@ public class MemberService {
         return Math.toIntExact(memberMapper.countByExample(null));
     }
 
-    public long register(String mobile) {
+    public long register(MemberRegisterReq req) {
         // 查询手机号是否已经被注册
         // memberexample类即查询条件
+        String mobile= req.getMobile();
         MemberExample memberExample = new MemberExample();
         memberExample.createCriteria().andMobileEqualTo(mobile);
         List<Member> list = memberMapper.selectByExample(memberExample);
