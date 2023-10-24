@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="member" />
+        <module name="generator" />
         <module name="common" />
         <module name="gateway" />
       </profile>
@@ -16,6 +17,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="common" options="-parameters" />
       <module name="gateway" options="-parameters" />
+      <module name="generator" options="-parameters" />
       <module name="member" options="-parameters" />
       <module name="train" options="" />
     </option>
