@@ -92,8 +92,10 @@ public class MemberService {
             throw new BusinessException(BusinessExceptionEnum.MEMBER_MOBILE_NOT_EXIST);
         }
         // 短信验证码校验
-        // 通过查询短信记录表校验（略），若验证码错误，则抛出BusinessExceptionEnum.MEMBER_MOBILE_CODE_ERROR错误
-        ;
+        // 通过查询短信记录表校验（略）
+        if (!"8888".equals(code)) {
+            throw new BusinessException(BusinessExceptionEnum.MEMBER_MOBILE_CODE_ERROR);
+        }
         // 将用户信息拷贝为封装返回类并返回
         return BeanUtil.copyProperties(memberDB,MemberLoginResp.class);
     }

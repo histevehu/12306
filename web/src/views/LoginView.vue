@@ -24,7 +24,7 @@
             name="code"
             :rules="[{ required: true, message: '请输入验证码!' }]"
         >
-          <a-input v-model:value="loginForm.code">
+          <a-input v-model:value="loginForm.code" placeholder="短信验证码（测试：8888）">
             <template #addonAfter>
               <a @click="sendCode">获取验证码</a>
             </template>
@@ -43,6 +43,10 @@
 <script>
 import {defineComponent, reactive} from 'vue';
 import axios from "axios";
+import {notification} from "ant-design-vue";
+import router from "@/router";
+import store from "@/store";
+
 export default defineComponent({
   setup() {
     // 声明reactive响应式变量
@@ -57,14 +61,25 @@ export default defineComponent({
       }).then(response => {
         let data = response.data;
         if (data.success) {
-          loginForm.code = "8888"
+          notification.success({description: '短信验证码发送成功'});
+          loginForm.code = "8888";
         } else {
-        //   TODO
+          notification.error({description: data.message});
         }
       });
     };
     const login = () => {
-      // TODO
+      axios.post("http://localhost:8000/member/member/login", loginForm).then((response) => {
+        let data = response.data;
+        if (data.success) {
+          notification.success({description: '登录成功'});
+          // 登录成功，跳到控台主页
+          router.push("/welcome");
+          store.commit("setMember", data.content);
+        } else {
+          notification.error({description: data.message});
+        }
+      })
     };
     // return可将变量、事件暴露给html使用
     return {
@@ -77,7 +92,7 @@ export default defineComponent({
 </script>
 <style>
 .login-main h1 {
-  font-family: "Microsoft YaHei UI Light",system-ui;
+  font-family: "Microsoft YaHei UI Light", system-ui;
   font-size: 25px;
   font-weight: bold;
 }

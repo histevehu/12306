@@ -17,6 +17,9 @@ Content-Type: application/json
 
 ###
 POST http://localhost:8000/member/member/login
-Content-Type: application/x-www-form-urlencoded
+Content-Type: application/json
 
-mobile= &code=
+{
+  "mobile": "18000000000",
+  "code": "1234"
+}

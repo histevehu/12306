@@ -43,7 +43,7 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public CommonResp<MemberLoginResp> login(@Valid MemberLoginReq req) {
+    public CommonResp<MemberLoginResp> login(@Valid @RequestBody MemberLoginReq req) {
         // 将MemberLoginResp封装返回类作为CommonResp封装返回类的主体
         return new CommonResp<>(memberService.login(req));
     }
