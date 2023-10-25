@@ -34,3 +34,8 @@ axios.interceptors.response.use(function (response) {
   console.log('返回错误：', error);
   return Promise.reject(error);
 });
+// 读取环境配置文件
+console.log('环境：', process.env.NODE_ENV);
+console.log('服务端：', process.env.VUE_APP_SERVER);
+// 自动设置Axios的Base URL
+axios.defaults.baseURL = process.env.VUE_APP_SERVER;
