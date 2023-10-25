@@ -8,10 +8,7 @@ import com.steve.train.member.resp.MemberLoginResp;
 import com.steve.train.member.service.MemberService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/member")
@@ -28,7 +25,9 @@ public class MemberController {
     }
 
     @PostMapping("/sendCode")
-    public CommonResp<String> sendCode(@Valid MemberSendCodeReq req) {
+    // 只有在Controller传入的封装类参数前加@Valid，封装类中的参数校验注入才能生效
+    // @RequestBody主要用来接收前端传递给后端的json字符串中的数据的(请求体中的数据的)，所以只能发送POST请求
+    public CommonResp<String> sendCode(@Valid @RequestBody MemberSendCodeReq req) {
         memberService.sendCode(req);
         // 在实例化泛型类时可以省略泛型参数，编译器会根据上下文自动推断
         return new CommonResp<>();

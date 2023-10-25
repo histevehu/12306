@@ -47,17 +47,17 @@ export default defineComponent({
   setup() {
     // 声明reactive响应式变量
     const loginForm = reactive({
-      mobile: '',
+      mobile: '18000000000',
       code: '',
     });
     // 声明事件
     const sendCode = () => {
-      axios.post("/member/member/sendCode", {
+      axios.post("http://localhost:8000/member/member/sendCode", {
         mobile: loginForm.mobile
       }).then(response => {
         let data = response.data;
         if (data.success) {
-          loginForm.code = "8888";
+          loginForm.code = "8888"
         } else {
         //   TODO
         }
