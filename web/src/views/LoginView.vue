@@ -44,7 +44,6 @@
 import {defineComponent, reactive} from 'vue';
 import axios from "axios";
 import {notification} from "ant-design-vue";
-import store from "@/store";
 import {useRouter} from "vue-router";
 
 export default defineComponent({
