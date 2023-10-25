@@ -1,6 +1,6 @@
-package com.steve.train.member.domain;
+package com.steve.train.member.resp;
 
-public class Member {
+public class MemberLoginResp {
     private Long id;
 
     private String mobile;
@@ -33,7 +33,7 @@ public class Member {
         return sb.toString();
     }
 
-    public Member(Long id, String mobile) {
+    public MemberLoginResp(Long id, String mobile) {
         this.id = id;
         this.mobile = mobile;
     }
