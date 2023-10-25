@@ -1,9 +1,11 @@
 package com.steve.train.common.controller;
 
+import cn.hutool.core.util.RandomUtil;
 import com.steve.train.common.exception.BusinessException;
 import com.steve.train.common.resp.CommonResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -71,6 +73,7 @@ public class ControllerExceptionHandler {
     @ResponseBody
     public CommonResp exceptionHandler(BindException e) {
         CommonResp commonResp = new CommonResp();
+        MDC.put("LOG_ID", System.currentTimeMillis() + RandomUtil.randomString(3));
         LOG.error("校验异常：{}", e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
         commonResp.setSuccess(false);
         commonResp.setMessage(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
