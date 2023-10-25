@@ -29,9 +29,9 @@ public class MemberController {
 
     @PostMapping("/sendCode")
     public CommonResp<String> sendCode(@Valid MemberSendCodeReq req) {
-        String code = memberService.sendCode(req);
+        memberService.sendCode(req);
         // 在实例化泛型类时可以省略泛型参数，编译器会根据上下文自动推断
-        return new CommonResp<>(code);
+        return new CommonResp<>();
     }
 
     @PostMapping("/register")

@@ -59,7 +59,7 @@ public class MemberService {
      * @param req
      * @return
      */
-    public String sendCode(MemberSendCodeReq req) {
+    public void sendCode(MemberSendCodeReq req) {
         // 查询手机号是否已经被注册
         // memberexample类即查询条件
         String mobile = req.getMobile();
@@ -79,7 +79,6 @@ public class MemberService {
         LOG.info("短信验证码：{}，保存到短信验证码记录表", mobile);
         // 对接短信发送平台（略）
         LOG.info("短信验证码：{}，短信发送平台发送成功", mobile);
-        return code;
     }
 
     public MemberLoginResp login(MemberLoginReq req) {
