@@ -1,4 +1,4 @@
-package com.steve.train.common.util;
+package com.steve.train.gateway.util;
 
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
@@ -48,13 +48,18 @@ public class JWTUtil {
     }
 
     public static boolean validate(String token) {
-        LOG.info("开始JWT校验，token：{}", token);
-        GlobalBouncyCastleProvider.setUseBouncyCastle(false);
-        JWT jwt = cn.hutool.jwt.JWTUtil.parseToken(token).setKey(key.getBytes());
-        // validate包含了verify
-        boolean validate = jwt.validate(0);
-        LOG.info("JWT校验结果：{}", validate);
-        return validate;
+        try {
+            LOG.info("开始JWT校验，token：{}", token);
+            GlobalBouncyCastleProvider.setUseBouncyCastle(false);
+            JWT jwt = cn.hutool.jwt.JWTUtil.parseToken(token).setKey(key.getBytes());
+            // validate包含了verify
+            boolean validate = jwt.validate(0);
+            LOG.info("JWT校验结果：{}", validate);
+            return validate;
+        } catch (Exception e) {
+            LOG.error("JWT校验异常",e);
+            return false;
+        }
     }
 
     public static JSONObject getJSONObject(String token) {

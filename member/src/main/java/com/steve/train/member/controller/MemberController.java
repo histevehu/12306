@@ -10,6 +10,8 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+// @RestController是@Controller和@ResponseBody的结合体，两个标注合并起来的作用。
+// @RestController类中的所有方法只能返回String、Object、Json等实体对象，不能跳转到模版页面。
 @RestController
 @RequestMapping("/member")
 public class MemberController {
