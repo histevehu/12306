@@ -23,6 +23,7 @@ for (const i in icons) {
 // Axios拦截器配置:
 // 1.打印请求和返回结果的日志
 // 2.添加JWT到请求的header中
+// 3.动态登录拦截：若返回结果显示登录失效则自动跳转到登录页（静态登录拦截通过路由登录拦截实现）
 axios.interceptors.request.use(function (config) {
     console.log('请求参数：', config);
     const _token = store.state.member.token;
