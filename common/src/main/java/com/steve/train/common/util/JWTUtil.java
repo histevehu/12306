@@ -57,6 +57,12 @@ public class JWTUtil {
         return validate;
     }
 
+    /**
+     * token由id,mobile等其他信息经加密后生成。本函数将token解密并剥离其他数据，返回id,mobile
+     *
+     * @param token
+     * @return Json格式的id, mobile字段
+     */
     public static JSONObject getJSONObject(String token) {
         GlobalBouncyCastleProvider.setUseBouncyCastle(false);
         JWT jwt = cn.hutool.jwt.JWTUtil.parseToken(token).setKey(key.getBytes());

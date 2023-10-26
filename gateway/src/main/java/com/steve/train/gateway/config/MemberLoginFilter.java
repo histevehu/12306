@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 /*
  * @author     : Steve Hu
  * @date       : 2023/10/26 9:35
- * @description: 用户登录过滤器，在gateway统一检查过滤。需要添加@Component注入并实现GlobalFilter接口
+ * @description: 用户登录过滤器。在gateway统一检查JWT的有效性并过滤。需要添加@Component注入并实现GlobalFilter接口
  */
 @Component
 public class MemberLoginFilter implements GlobalFilter, Ordered {
