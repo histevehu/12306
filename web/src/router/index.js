@@ -12,7 +12,37 @@ const routes = [{
         // 用于指定是否开启路由登录检验拦截
         // 适用于静态页面，动态页面因为通过Axios拦截器实现动态拦截而不需要指定
         loginRequire: true
-    }
+    }, // 前端二级路由
+    children: [
+        {
+            // 首页路由跳转
+            path: '',
+            redirect: '/welcome'
+        },
+        {
+            // 二级路由path=父path+path='/welcome'
+            path: 'welcome',
+            component: () => import(/* webpackChunkName: "about" */ '../views/ConsoleSubViews/WelcomeView.vue')
+        },
+        {
+            path: 'passenger',
+            component: () => import('../views/ConsoleSubViews/PassengerView.vue'),
+        }, {
+            path: 'ticket',
+            component: () => import('../views/ConsoleSubViews/TicketView.vue'),
+        }, {
+            path: 'order',
+            component: () => import('../views/ConsoleSubViews/OrderView.vue'),
+        }, {
+            path: 'myticket',
+            component: () => import('../views/ConsoleSubViews/MyTicketView.vue')
+        }, {
+            path: 'seat',
+            component: () => import('../views/ConsoleSubViews/SeatView.vue')
+        }, {
+            path: 'admin',
+            component: () => import('../views/ConsoleSubViews/AdminView.vue')
+        }]
 }]
 
 const router = createRouter({
@@ -27,7 +57,7 @@ router.beforeEach((to, from, next) => {
         console.log(item, "是否需要登录校验：", item.meta.loginRequire || false);
         return item.meta.loginRequire
     }))
-    // 需要路由登录检验
+        // 需要路由登录检验
     {
         const _member = store.state.member;
         console.log("页面登录校验：", _member);

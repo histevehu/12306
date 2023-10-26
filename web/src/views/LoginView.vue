@@ -51,7 +51,7 @@ import store from "@/store";
 export default defineComponent({
   setup() {
     // 声明reactive响应式变量
-    const router=useRouter()
+    const router = useRouter()
     const loginForm = reactive({
       mobile: '18000000000',
       code: '',
@@ -76,10 +76,10 @@ export default defineComponent({
         if (data.success) {
           notification.success({description: '登录成功'});
           // 登录成功，跳到控制台主页
-          router.push("/");
+          router.push("/welcome");
           // 必须通过commit()调用store内的mutations方法以提交数据修改
           // setMember()中第一个参数state类似于Python函数中的self，不用理会
-          store.commit("setMember",data.content)
+          store.commit("setMember", data.content)
         } else {
           notification.error({description: data.message});
         }
