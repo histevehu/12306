@@ -16,6 +16,7 @@ Content-Type: application/json
 }
 
 ###
+#登录测试，并使用HTTPClient保存JWT为全局变量，供其他测试使用
 POST http://localhost:8000/member/member/login
 Content-Type: application/json
 
@@ -23,3 +24,9 @@ Content-Type: application/json
   "mobile": "18000000000",
   "code": "8888"
 }
+
+> {%
+client.log(JSON.stringify(response.body));
+client.log(JSON.stringify(response.body.content.token));
+client.global.set("test_token", response.body.content.token);
+%}
