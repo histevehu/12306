@@ -41,8 +41,8 @@
                              targetPackage="com.steve.train.member.mapper"
                              type="XMLMAPPER"/>
 
-        <table tableName="member" domainObjectName="Member"/>
-        <!--<table tableName="passenger" domainObjectName="Passenger"/>-->
+        <!--<table tableName="member" domainObjectName="Member"/>-->
+        <table tableName="passenger" domainObjectName="Passenger"/>
 <!--        <table tableName="ticket" domainObjectName="Ticket"/>-->
     </context>
 </generatorConfiguration>
