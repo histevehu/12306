@@ -1,16 +1,21 @@
 package com.steve.train.member.req;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Date;
 
 public class PassengerSaveReq {
     private Long id;
 
+    // @NotBlank不能用于long类型的参数校验
+    @NotNull(message = "用户ID不能为空")
     private Long memberId;
-
+    @NotBlank(message = "姓名不能为空")
     private String name;
-
+    @NotBlank(message = "身份证号不能为空")
     private String idCard;
-
+    @NotBlank(message = "乘客类型不能为空")
     private String type;
 
     private Date createTime;
