@@ -4,9 +4,9 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.jwt.JWTUtil;
 import com.steve.train.common.exception.BusinessException;
 import com.steve.train.common.exception.BusinessExceptionEnum;
+import com.steve.train.common.util.JWTUtil;
 import com.steve.train.common.util.SnowFlakeUtil;
 import com.steve.train.member.domain.Member;
 import com.steve.train.member.domain.MemberExample;
@@ -101,9 +101,8 @@ public class MemberService {
         // 将用户信息拷贝为封装返回类并返回
         MemberLoginResp memberLoginResp = BeanUtil.copyProperties(memberDB, MemberLoginResp.class);
         Map<String, Object> map = BeanUtil.beanToMap(memberLoginResp);
-        // 给JWT签名（加盐值）
-        String key = "SteveHu_12306Train";
-        String token = JWTUtil.createToken(map, key.getBytes());
+        // 生成JWT
+        String token = JWTUtil.createToken(memberLoginResp.getId(), memberLoginResp.getMobile());
         memberLoginResp.setToken(token);
         return memberLoginResp;
     }
