@@ -1,12 +1,13 @@
 <template>
   <a-layout-header class="header">
     <div class="logo">
+      <!--使用 router-link标签+to来跳转页面，相当于a标签+href-->
       <router-link to="/" style="color: white; font-size: 18px">
         12306铁路售票系统
       </router-link>
     </div>
     <div style="float: right; color: white;">
-      您好
+      您好：{{ member.mobile }} &nbsp;&nbsp;
       <router-link to="/login" style="color: white;">
         退出登录
       </router-link>
@@ -53,11 +54,15 @@
 
 <script>
 import {defineComponent} from 'vue';
+import store from "@/store";
 
 export default defineComponent({
   name: "ConsoleHeaderView",
   setup() {
-
+    let member = store.state.member;
+    return {
+      member
+    }
   },
 });
 </script>

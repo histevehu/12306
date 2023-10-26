@@ -45,6 +45,8 @@ import {defineComponent, reactive} from 'vue';
 import axios from "axios";
 import {notification} from "ant-design-vue";
 import {useRouter} from "vue-router";
+// @指src根目录
+import store from "@/store";
 
 export default defineComponent({
   setup() {
@@ -75,6 +77,9 @@ export default defineComponent({
           notification.success({description: '登录成功'});
           // 登录成功，跳到控制台主页
           router.push("/");
+          // 必须通过commit()调用store内的mutations方法以提交数据修改
+          // setMember()中第一个参数state类似于Python函数中的self，不用理会
+          store.commit("setMember",data.content)
         } else {
           notification.error({description: data.message});
         }
