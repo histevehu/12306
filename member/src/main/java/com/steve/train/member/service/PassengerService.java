@@ -90,4 +90,8 @@ public class PassengerService {
         objectPageResp.setList(list);
         return objectPageResp;
     }
+
+    public void delete(long id) {
+        passengerMapper.deleteByPrimaryKey(id);
+    }
 }

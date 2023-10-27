@@ -32,4 +32,11 @@ public class PassengerController {
         req.setMemberId(MemberLoginContext.getId());
         return new CommonResp<>(passengerService.queryList(req));
     }
+
+    @DeleteMapping("/delete/{id}")
+    // @PathVariable将URL中的参数和Controller的传入参数自动映射
+    public CommonResp<Object> delete(@PathVariable long id) {
+        passengerService.delete(id);
+        return new CommonResp<>();
+    }
 }
