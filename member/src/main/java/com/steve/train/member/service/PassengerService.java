@@ -53,9 +53,9 @@ public class PassengerService {
         if (ObjectUtil.isNotNull(req.getMemberId())) {
             passengerCriteria.andMemberIdEqualTo(req.getMemberId());
         }
-        // pageSize指定将所有数据分为几页，pageNum指定查询第几页数据（从1开始）。每页数据由PageHelper自动计算
+        // PageHelper.startPage参数：pageNum指定查询第几页数据（从1开始），pageSize指定每页数据数量。分页数量由PageHelper自动计算
         // 对这句往下遇到的第一个SQL做拦截，增加分页 limit
-        PageHelper.startPage(1, 3);
+        PageHelper.startPage(req.getStartPage(), req.getPageSize());
         List<Passenger> passengerList = passengerMapper.selectByExample(passengerExample);
         return BeanUtil.copyToList(passengerList, PassengerQueryResp.class);
     }

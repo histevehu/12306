@@ -1,11 +1,13 @@
 package com.steve.train.member.req;
 
+import com.steve.train.common.req.PageReq;
+
 /*
  * @author     : Steve Hu
  * @date       : 2023/10/27 8:42
  * @description: 乘客查询请求封装类
  */
-public class PassengerQueryReq {
+public class PassengerQueryReq extends PageReq {
     private long memberId;
 
 

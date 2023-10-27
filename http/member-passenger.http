@@ -10,7 +10,9 @@ token:{{test_token}}
 }
 
 ###
-GET http://localhost:8000/member/passenger/queryList
+#GET参数在URL内拼接
+GET http://localhost:8000/member/passenger/queryList?startPage=1&pageSize=2
 Content-Type: application/json
 #读取member-member的login测试中保存的全局变量test_token
 token:{{test_token}}
+
