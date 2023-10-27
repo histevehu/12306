@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 /*
  * @author     : Steve Hu
  * @date       : 2023/10/27 10:11
- * @description: 分页请求封装类
+ * @description: 分页请求封装类。使用时将其他业务请求封装类继承本类。
  */
 public class PageReq {
     @NotNull(message = "页码不能为空")

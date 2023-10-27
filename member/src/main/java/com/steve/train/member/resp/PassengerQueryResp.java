@@ -5,7 +5,7 @@ import java.util.Date;
 /*
  * @author     : Steve Hu
  * @date       : 2023/10/27 9:14
- * @description: 乘客查询结果返回封装类
+ * @description: 乘客查询结果封装类
  */
 public class PassengerQueryResp {
     private Long id;
