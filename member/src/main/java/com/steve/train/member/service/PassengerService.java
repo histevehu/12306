@@ -54,6 +54,8 @@ public class PassengerService {
      */
     public PageResp<PassengerQueryResp> queryList(PassengerQueryReq req) {
         PassengerExample passengerExample = new PassengerExample();
+        // 查询结果按照id升序排列
+        passengerExample.setOrderByClause("id asc");
         // 复用criteria对象。当存在多个判断添加条件时可以复用。
         // 注意：若每次都通过passengerExample.createCriteria().XXX添加条件，只能以最后一个为准
         PassengerExample.Criteria passengerCriteria = passengerExample.createCriteria();
@@ -62,7 +64,7 @@ public class PassengerService {
         }
         // PageHelper.startPage参数：pageNum指定查询第几页数据（从1开始），pageSize指定每页数据数量。分页数量由PageHelper自动计算
         // 对这句往下遇到的第一个SQL做拦截，增加分页 limit
-        PageHelper.startPage(req.getStartPage(), req.getPageSize());
+        PageHelper.startPage(req.getPage(), req.getSize());
         List<Passenger> passengerList = passengerMapper.selectByExample(passengerExample);
         PageInfo<Passenger> pageInfo = new PageInfo<>(passengerList);
         LOG.info("总行数：{}", pageInfo.getTotal());

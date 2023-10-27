@@ -31,7 +31,7 @@
       </template>
     </template>
   </a-table>
-  <a-modal v-model:visible="visible" title="乘车人" @ok="handleOk"
+  <a-modal v-model:visible="visible" title="新增乘客" @ok="handleOk"
            ok-text="确认" cancel-text="取消">
     <a-form :model="passenger" :label-col="{span: 4}" :wrapper-col="{ span: 20 }">
       <a-form-item label="姓名">
@@ -74,8 +74,11 @@ export default defineComponent({
     const passengers = ref([]);
     // 分页的三个属性名是固定的
     const pagination = ref({
+      // 数据总数
       total: 0,
+      // 当前页数
       current: 1,
+      // 每页数据条数
       pageSize: 10,
     });
     let loading = ref(false);
@@ -150,7 +153,8 @@ export default defineComponent({
         };
       }
       loading.value = true;
-      axios.get("/member/passenger/query-list", {
+      // Axios的GET请求带参数，固定放在params对象里
+      axios.get("/member/passenger/queryList", {
         params: {
           page: param.page,
           size: param.size
@@ -177,6 +181,8 @@ export default defineComponent({
       });
     };
 
+    // Vue生命周期钩子函数，当页面渲染完成后执行
+    // 所有后端请求统一放在初始化函数中，等待页面渲染完成后执行，防止从页面元素取值但不存在的情况
     onMounted(() => {
       handleQuery({
         page: 1,

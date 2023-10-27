@@ -10,34 +10,34 @@ import jakarta.validation.constraints.NotNull;
  */
 public class PageReq {
     @NotNull(message = "页码不能为空")
-    private Integer startPage;
+    private Integer page;
 
     @NotNull(message = "每页条数不能为空")
     // 后端参数校验，防止前端传入过大参数
     @Max(value = 100, message = "每页条数不能超过100")
-    private Integer pageSize;
+    private Integer size;
 
-    public Integer getStartPage() {
-        return startPage;
+    public Integer getPage() {
+        return page;
     }
 
-    public void setStartPage(Integer startPage) {
-        this.startPage = startPage;
+    public void setPage(Integer page) {
+        this.page = page;
     }
 
-    public Integer getPageSize() {
-        return pageSize;
+    public Integer getSize() {
+        return size;
     }
 
-    public void setPageSize(Integer pageSize) {
-        this.pageSize = pageSize;
+    public void setSize(Integer size) {
+        this.size = size;
     }
 
     @Override
     public String toString() {
         return "PageReq{" +
-                "page=" + startPage +
-                ", size=" + pageSize +
+                "page=" + page +
+                ", size=" + size +
                 '}';
     }
 }

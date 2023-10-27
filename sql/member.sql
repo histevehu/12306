@@ -22,4 +22,4 @@ create table `passenger`
     primary key (`id`),
     index `member_id_index` (`member_id`)
 ) engine = innodb
-  default charset = utf8mb4 comment ='乘车人';
+  default charset = utf8mb4 comment ='乘客';

@@ -1,6 +1,8 @@
 package com.steve.train.member.resp;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import java.util.Date;
 
@@ -10,8 +12,11 @@ import java.util.Date;
  * @description: 乘客查询结果封装类
  */
 public class PassengerQueryResp {
+    // 对long类型数字前后端交互精度丢失的属性单独配置字符串序列化
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long memberId;
 
     private String name;

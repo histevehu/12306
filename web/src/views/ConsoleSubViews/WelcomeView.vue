@@ -19,9 +19,9 @@
   <a-divider/>
   <div>
     <div>
-      如果您还没有乘车人，可以先去
+      如果您还没有乘客信息，可以先去
       <router-link to="/passenger">
-        添加乘车人
+        添加乘客
       </router-link>
     </div>
     <div>
