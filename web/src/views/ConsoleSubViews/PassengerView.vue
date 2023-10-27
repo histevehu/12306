@@ -10,6 +10,7 @@
            :pagination="pagination"
            @change="handleTableChange"
            :loading="loading">
+    <!--自定义列，bodyCell属性：{列名，每行的数据}-->
     <template #bodyCell="{ column, record }">
       <template v-if="column.dataIndex === 'operation'">
         <a-space>

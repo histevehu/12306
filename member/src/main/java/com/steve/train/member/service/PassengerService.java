@@ -34,15 +34,28 @@ public class PassengerService {
 
     private final static Logger LOG = LoggerFactory.getLogger(PassengerService.class);
 
+    /**
+     * 乘客信息保存服务（新增、修改）
+     *
+     * @param req
+     */
     public void save(PassengerSaveReq req) {
         DateTime now = DateTime.now();
         Passenger passenger = BeanUtil.copyProperties(req, Passenger.class);
-        passenger.setId(SnowFlakeUtil.getSnowFlakeNextId());
-        // 读取线程本地变量中当前用户的ID
-        passenger.setMemberId(MemberLoginContext.getId());
-        passenger.setCreateTime(now);
-        passenger.setUpdateTime(now);
-        passengerMapper.insert(passenger);
+        // 若请求的id为空，则该请求为新增请求
+        if (ObjectUtil.isNull(passenger.getId())) {
+            passenger.setId(SnowFlakeUtil.getSnowFlakeNextId());
+            // 读取线程本地变量中当前用户的ID
+            passenger.setMemberId(MemberLoginContext.getId());
+            passenger.setCreateTime(now);
+            passenger.setUpdateTime(now);
+            passengerMapper.insert(passenger);
+        }
+        // 否则是修改请求
+        else {
+            passenger.setUpdateTime(now);
+            passengerMapper.updateByPrimaryKey(passenger);
+        }
     }
 
     /**
