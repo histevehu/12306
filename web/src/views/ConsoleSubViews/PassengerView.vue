@@ -59,6 +59,7 @@ import axios from "axios";
 export default defineComponent({
   name: "PassengerView",
   setup() {
+    // 在main.js中import相应的js资源文件后可通过window.属性名读取
     const PASSENGER_TYPE_ARRAY = window.PASSENGER_TYPE_ARRAY;
     const visible = ref(false);
     let passenger = ref({
