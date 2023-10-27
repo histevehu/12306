@@ -49,7 +49,8 @@ public class PassengerService {
      * 乘客信息查询
      *
      * @param req
-     * @return PassengerQueryResp乘客查询请求结果封装类。注意：开发规范是Controller不使用持久层实体类，所以不能直接返回Passenger对象
+     * @return PassengerQueryResp乘客查询请求结果封装类。
+     * 注意：开发规范是Controller不使用持久层实体类，应该返回结果封装类（方便对结果进行处理等）
      */
     public PageResp<PassengerQueryResp> queryList(PassengerQueryReq req) {
         PassengerExample passengerExample = new PassengerExample();
