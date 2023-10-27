@@ -3,6 +3,7 @@ package com.steve.train.member.service;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
+import com.github.pagehelper.PageHelper;
 import com.steve.train.common.context.MemberLoginContext;
 import com.steve.train.common.util.SnowFlakeUtil;
 import com.steve.train.member.domain.Passenger;
@@ -52,6 +53,9 @@ public class PassengerService {
         if (ObjectUtil.isNotNull(req.getMemberId())) {
             passengerCriteria.andMemberIdEqualTo(req.getMemberId());
         }
+        // pageSize指定将所有数据分为几页，pageNum指定查询第几页数据（从1开始）。每页数据由PageHelper自动计算
+        // 对这句往下遇到的第一个SQL做拦截，增加分页 limit
+        PageHelper.startPage(1, 3);
         List<Passenger> passengerList = passengerMapper.selectByExample(passengerExample);
         return BeanUtil.copyToList(passengerList, PassengerQueryResp.class);
     }
