@@ -8,3 +8,9 @@ token:{{test_token}}
   "idCard": "123321",
   "type": "1"
 }
+
+###
+GET http://localhost:8000/member/passenger/queryList
+Content-Type: application/json
+#读取member-member的login测试中保存的全局变量test_token
+token:{{test_token}}

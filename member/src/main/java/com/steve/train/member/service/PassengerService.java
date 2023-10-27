@@ -2,13 +2,19 @@ package com.steve.train.member.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.ObjectUtil;
 import com.steve.train.common.context.MemberLoginContext;
 import com.steve.train.common.util.SnowFlakeUtil;
 import com.steve.train.member.domain.Passenger;
+import com.steve.train.member.domain.PassengerExample;
 import com.steve.train.member.mapper.PassengerMapper;
+import com.steve.train.member.req.PassengerQueryReq;
 import com.steve.train.member.req.PassengerSaveReq;
+import com.steve.train.member.resp.PassengerQueryResp;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /*
  * @author     : Steve Hu
@@ -30,5 +36,23 @@ public class PassengerService {
         passenger.setCreateTime(now);
         passenger.setUpdateTime(now);
         passengerMapper.insert(passenger);
+    }
+
+    /**
+     * 乘客信息查询
+     *
+     * @param req
+     * @return PassengerQueryResp乘客查询请求结果封装类。注意：开发规范是Controller不使用持久层实体类，所以不能直接返回Passenger对象
+     */
+    public List<PassengerQueryResp> queryList(PassengerQueryReq req) {
+        PassengerExample passengerExample = new PassengerExample();
+        // 复用criteria对象。当存在多个判断添加条件时可以复用。
+        // 注意：若每次都通过passengerExample.createCriteria().XXX添加条件，只能以最后一个为准
+        PassengerExample.Criteria passengerCriteria = passengerExample.createCriteria();
+        if (ObjectUtil.isNotNull(req.getMemberId())) {
+            passengerCriteria.andMemberIdEqualTo(req.getMemberId());
+        }
+        List<Passenger> passengerList = passengerMapper.selectByExample(passengerExample);
+        return BeanUtil.copyToList(passengerList, PassengerQueryResp.class);
     }
 }
