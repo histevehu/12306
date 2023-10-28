@@ -1,4 +1,4 @@
-package com.steve.train.member.config;
+package com.steve.train.business.config;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
@@ -14,16 +14,16 @@ import org.springframework.core.env.Environment;
 @ComponentScan("com.steve")
 //持久层的Java代码放在mapper中，xml配置文件放在resources的mapper中
 //通过配置MapperScan让Spring扫描MyBatis的代码
-@MapperScan("com.steve.train.member.mapper")
-public class MemberApplication {
+@MapperScan("com.steve.train.business.mapper")
+public class BusinessApplication {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MemberApplication.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BusinessApplication.class);
 
     public static void main(String[] args) {
-        SpringApplication app = new SpringApplication(MemberApplication.class);
+        SpringApplication app = new SpringApplication(BusinessApplication.class);
         Environment env = app.run(args).getEnvironment();
-        LOG.info("Member Application，启动！");
-        LOG.info("Root URL: http://localhost:{}{}/", env.getProperty("server.port"),env.getProperty("server.servlet.context-path"));
+        LOG.info("Business Application，启动！");
+        LOG.info("Root URL: http://localhost:{}{}", env.getProperty("server.port"),env.getProperty("server.servlet.context-path"));
     }
 
 }
