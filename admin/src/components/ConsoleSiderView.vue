@@ -7,32 +7,12 @@
     >
       <a-menu-item key="/">
         <router-link to="/">
-          <coffee-outlined/> &nbsp; 欢迎
+          <coffee-outlined/> 欢迎
         </router-link>
       </a-menu-item>
-      <a-menu-item key="/passenger">
-        <router-link to="/passenger">
-          <user-outlined/> &nbsp; 乘客管理
-        </router-link>
-      </a-menu-item>
-      <a-menu-item key="/ticket">
-        <router-link to="/ticket">
-          <border-outer-outlined/> &nbsp; 余票查询
-        </router-link>
-      </a-menu-item>
-      <a-menu-item key="/myticket">
-        <router-link to="/myticket">
-          <idcard-outlined/> &nbsp; 我的车票
-        </router-link>
-      </a-menu-item>
-      <a-menu-item key="/seat">
-        <router-link to="/seat">
-          <usergroup-add-outlined/> &nbsp; 座位销售图
-        </router-link>
-      </a-menu-item>
-      <a-menu-item key="/admin">
-        <router-link to="/admin">
-          <desktop-outlined/> &nbsp; 控制台管理
+      <a-menu-item key="/station">
+        <router-link to="/station">
+          <MenuUnfoldOutlined/> 车站管理
         </router-link>
       </a-menu-item>
     </a-menu>
