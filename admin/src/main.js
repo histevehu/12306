@@ -28,11 +28,12 @@ for (const i in icons) {
 // 3.动态登录拦截：若返回结果显示登录失效则自动跳转到登录页（静态登录拦截通过路由登录拦截实现）
 axios.interceptors.request.use(function (config) {
     console.log('请求参数：', config);
-    const _token = store.state.member.token;
+    // admin请求默认无需携带token
+    /*const _token = store.state.member.token;
     if (_token) {
         config.headers.token = _token;
         console.log("请求headers添加token:", _token);
-    }
+    }*/
     return config;
 }, error => {
     return Promise.reject(error);
@@ -44,13 +45,14 @@ axios.interceptors.response.use(function (response) {
     console.log('返回错误：', error);
     const response = error.response;
     const status = response.status;
-    if (status === 401) {
+    // admin默认无需进行身份验证
+    /*if (status === 401) {
         // HTTP状态码是401，登录失效，跳转到登录页
         console.log("未登录或登录超时，跳到登录页");
         store.commit("setMember", {});
         // notification.error({description: "登录失效，请重新登录"});
         router.push('/login');
-    }
+    }*/
     return Promise.reject(error);
 });
 // 读取环境配置文件
