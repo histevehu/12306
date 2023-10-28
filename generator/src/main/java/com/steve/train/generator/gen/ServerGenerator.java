@@ -1,4 +1,4 @@
-package com.steve.train.generator.server;
+package com.steve.train.generator.gen;
 
 import cn.hutool.core.date.DateTime;
 import com.steve.train.generator.util.DBUtil;

@@ -46,6 +46,7 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
+        <!--因为PassengerTypeEnum枚举类是在member模块里的，所以需要在generator的pom里增加member依赖，才能使用这个类-->
         <dependency>
             <groupId>com.steve</groupId>
             <artifactId>member</artifactId>
