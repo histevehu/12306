@@ -82,6 +82,7 @@ public class ServerGenerator {
         System.out.println("组装参数：" + param);
 
         genJava(Domain, param, "service", "service");
+        genJava(Domain, param, "controller/admin", "adminController");
     }
 
     private static void genJava(String Domain, Map<String, Object> param, String packageName, String target) throws IOException, TemplateException {
