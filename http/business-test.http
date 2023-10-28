@@ -1,4 +1,3 @@
 
-GET http://localhost:8000/business
-Content-Type: application/json
-#读取business-business的login测试中保存的全局变量test_token
+GET http://localhost:8000/business/admin/station/queryList?page=1&size=5
+Accept: application/json

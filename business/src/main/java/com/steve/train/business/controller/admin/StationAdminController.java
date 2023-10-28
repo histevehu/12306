@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * @description: 车站管理员接口（FreeMarker生成）
  */
 @RestController
-@RequestMapping("/admin/Station")
+@RequestMapping("/admin/station")
 public class StationAdminController {
 
     @Resource

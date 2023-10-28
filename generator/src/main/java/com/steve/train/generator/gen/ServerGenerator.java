@@ -85,11 +85,11 @@ public class ServerGenerator {
         param.put("readOnly", readOnly);
         System.out.println("组装参数：" + param);
 
-        genJava(Domain, param, "service", "service");
-        genJava(Domain, param, "controller/admin", "adminController");
-        genJava(Domain, param, "req", "saveReq");
-        genJava(Domain, param, "req", "queryReq");
-        genJava(Domain, param, "resp", "queryResp");
+        // genJava(Domain, param, "service", "service");
+        // genJava(Domain, param, "controller/admin", "adminController");
+        // genJava(Domain, param, "req", "saveReq");
+        // genJava(Domain, param, "req", "queryReq");
+        // genJava(Domain, param, "resp", "queryResp");
 
         genVue(Domain, param);
     }
