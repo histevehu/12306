@@ -94,6 +94,7 @@ public class DBUtil {
                 } else {
                     field.setLength(0);
                 }
+                // 开发规范：若数据库字段为枚举类型，则需要在字段的评论内加上“枚举[枚举类类名]”供代码生成器读取
                 if (comment.contains("枚举")) {
                     field.setEnums(true);
 
@@ -101,6 +102,7 @@ public class DBUtil {
                     int start = comment.indexOf("[");
                     int end = comment.indexOf("]");
                     String enumsName = comment.substring(start + 1, end); // CourseLevelEnum
+                    // 将后端枚举转成前端常量，常量的规范就是全大写，用"_"连接
                     String enumsConst = StrUtil.toUnderlineCase(enumsName)
                             .toUpperCase().replace("_ENUM", "");
                     field.setEnumsConst(enumsConst);
@@ -148,7 +150,9 @@ public class DBUtil {
                 || sqlType.toUpperCase().contains("char".toUpperCase())
                 || sqlType.toUpperCase().contains("text".toUpperCase())) {
             return "String";
-        } else if (sqlType.toUpperCase().contains("datetime".toUpperCase())) {
+        }
+        // 数据库date,time,datetime类型都对应Java的Date类型
+        else if (sqlType.toUpperCase().contains("datetime".toUpperCase())) {
             return "Date";
         } else if (sqlType.toUpperCase().contains("time".toUpperCase())) {
             return "Date";

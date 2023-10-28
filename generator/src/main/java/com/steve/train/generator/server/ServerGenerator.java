@@ -37,7 +37,7 @@ public class ServerGenerator {
 
         // 读取table节点
         Document document = new SAXReader().read("generator/" + generatorPath);
-        // "//"为从根目录下寻找， pom是xml命名空间，configurationFile是节点名，如果要找属性，则是"@"
+        // "//"为从xml根节点寻找， pom是xml命名空间，configurationFile是节点名，如果要找属性，则是"@"
         Node table = document.selectSingleNode("//table");
         System.out.println(table);
         Node tableName = table.selectSingleNode("@tableName");
@@ -65,6 +65,7 @@ public class ServerGenerator {
         String do_main = tableName.getText().replaceAll("_", "-");
         // 表中文名
         String tableNameCn = DBUtil.getTableComment(tableName.getText());
+        // 获取数据表字段信息
         List<Field> fieldList = DBUtil.getColumnByTableName(tableName.getText());
         Set<String> typeSet = getJavaTypes(fieldList);
 
@@ -83,6 +84,9 @@ public class ServerGenerator {
 
         genJava(Domain, param, "service", "service");
         genJava(Domain, param, "controller/admin", "adminController");
+        genJava(Domain, param, "req", "saveReq");
+        genJava(Domain, param, "req", "queryReq");
+        genJava(Domain, param, "resp", "queryResp");
     }
 
     private static void genJava(String Domain, Map<String, Object> param, String packageName, String target) throws IOException, TemplateException {
