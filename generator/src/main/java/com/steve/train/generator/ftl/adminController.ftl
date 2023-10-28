@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * @description: ${tableNameCn}管理员接口（FreeMarker生成）
  */
 @RestController
-@RequestMapping("/admin/${do_main}")
+@RequestMapping("/admin/${Domain}")
 public class ${Domain}AdminController {
 
     @Resource
