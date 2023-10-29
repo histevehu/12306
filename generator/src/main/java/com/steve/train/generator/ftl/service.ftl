@@ -49,7 +49,7 @@ public class ${Domain}Service {
 
     public PageResp<${Domain}QueryResp> queryList(${Domain}QueryReq req) {
         ${Domain}Example ${domain}Example = new ${Domain}Example();
-        ${domain}Example.setOrderByClause("id desc");
+        ${domain}Example.setOrderByClause("id asc");
         ${Domain}Example.Criteria criteria = ${domain}Example.createCriteria();
 
         LOG.info("查询页码：{}", req.getPage());

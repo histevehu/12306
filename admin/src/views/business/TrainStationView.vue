@@ -28,7 +28,9 @@
            ok-text="确认" cancel-text="取消">
     <a-form :model="trainStation" :label-col="{span: 4}" :wrapper-col="{ span: 20 }">
       <a-form-item label="车次编号">
-        <a-input v-model:value="trainStation.trainCode"/>
+        <!--可向组件传入自定义参数width，也可以写作 :width="'100%'"-->
+        <!--可向组件传入自定义事件，例如 @change="XXX"-->
+        <TrainSelectView v-model="trainStation.trainCode" width="100%" @change=""></TrainSelectView>
       </a-form-item>
       <a-form-item label="站序">
         <a-input v-model:value="trainStation.index"/>
@@ -63,9 +65,11 @@ import {defineComponent, onMounted, ref, watch} from 'vue';
 import {notification} from "ant-design-vue";
 import axios from "axios";
 import {pinyin} from "pinyin-pro";
+import TrainSelectView from "@/components/TrainSelect.vue";
 
 export default defineComponent({
   name: "TrainStationView",
+  components: {TrainSelectView},
   setup() {
     const visible = ref(false);
     let trainStation = ref({
