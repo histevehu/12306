@@ -2,7 +2,7 @@ package com.steve.train.generator.gen;
 
 
 import cn.hutool.core.util.StrUtil;
-import com.steve.train.member.enums.PassengerTypeEnum;
+import com.steve.train.common.enums.TrainTypeEnum;
 
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnumGenerator {
-    static String path = "web/src/assets/js/enums.js";
+    static String path = "admin/src/assets/js/enums.js";
 
     public static void main(String[] args) {
         // 生成的JSON枚举对象
@@ -23,7 +23,8 @@ public class EnumGenerator {
         StringBuffer bufferArray = new StringBuffer();
         long begin = System.currentTimeMillis();
         try {
-            toJson(PassengerTypeEnum.class, bufferObject, bufferArray);
+            // toJson(PassengerTypeEnum.class, bufferObject, bufferArray);
+            toJson(TrainTypeEnum.class, bufferObject, bufferArray);
             StringBuffer buffer = bufferObject.append("\r\n").append(bufferArray);
             writeJs(buffer);
         } catch (Exception e) {
