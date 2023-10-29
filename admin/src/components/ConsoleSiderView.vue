@@ -25,6 +25,11 @@
           <MenuUnfoldOutlined/> 火车车站管理
         </router-link>
       </a-menu-item>
+      <a-menu-item key="/trainCarriage">
+        <router-link to="/trainCarriage">
+          <MenuUnfoldOutlined/> 火车车厢管理
+        </router-link>
+      </a-menu-item>
     </a-menu>
   </a-layout-sider>
 </template>
