@@ -57,16 +57,35 @@ create table `train_station`
   default charset = utf8mb4 comment ='火车车站';
 
 drop table if exists `train_carriage`;
-create table `train_carriage` (
-  `id` bigint not null comment 'id',
-  `train_code` varchar(20) not null comment '车次编号',
-  `index` int not null comment '厢号',
-  `seat_type` char(1) not null comment '座位类型|枚举[SeatTypeEnum]',
-  `seat_count` int not null comment '座位数',
-  `row_count` int not null comment '排数',
-  `col_count` int not null comment '列数',
-  `create_time` datetime(3) comment '新增时间',
-  `update_time` datetime(3) comment '修改时间',
-  unique key `train_code_index_unique` (`train_code`, `index`),
-  primary key (`id`)
-) engine=innodb default charset=utf8mb4 comment='火车车厢';
+create table `train_carriage`
+(
+    `id`          bigint      not null comment 'id',
+    `train_code`  varchar(20) not null comment '车次编号',
+    `index`       int         not null comment '厢号',
+    `seat_type`   char(1)     not null comment '座位类型|枚举[SeatTypeEnum]',
+    `seat_count`  int         not null comment '座位数',
+    `row_count`   int         not null comment '排数',
+    `col_count`   int         not null comment '列数',
+    `create_time` datetime(3) comment '新增时间',
+    `update_time` datetime(3) comment '修改时间',
+    unique key `train_code_index_unique` (`train_code`, `index`),
+    primary key (`id`)
+) engine = innodb
+  default charset = utf8mb4 comment ='火车车厢';
+
+drop table if exists `train_seat`;
+create table `train_seat`
+(
+    `id`                  bigint      not null comment 'id',
+    `train_code`          varchar(20) not null comment '车次编号',
+    `carriage_index`      int         not null comment '厢序',
+    `row`                 char(2)     not null comment '排号|01, 02',
+    # column是mysql关键字，用关键字作列号，在正常使用 mybatis时是没问题，mybatis会自动为关腱字增加反引号，但是在使用分布式事务 seata时会有问题，所以微服务项目还是避免用关键字
+    `col`                 char(1)     not null comment '列号|枚举[SeatColEnum]',
+    `seat_type`           char(1)     not null comment '座位类型|枚举[SeatTypeEnum]',
+    `carriage_seat_index` int         not null comment '同车厢座序',
+    `create_time`         datetime(3) comment '新增时间',
+    `update_time`         datetime(3) comment '修改时间',
+    primary key (`id`)
+) engine = innodb
+  default charset = utf8mb4 comment ='座位';
