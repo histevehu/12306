@@ -157,10 +157,13 @@ export default defineComponent({
 
     // 自动计算停车时长
     watch(() => trainStation.value.inTime, () => {
+      // 停车时间=出站时间-入站时间，单位：秒
       let diff = dayjs(trainStation.value.outTime, 'HH:mm:ss').diff(dayjs(trainStation.value.inTime, 'HH:mm:ss'), 'seconds');
+      // stopTime=0:0:0+停车时间
       trainStation.value.stopTime = dayjs('00:00:00', 'HH:mm:ss').second(diff).format('HH:mm:ss');
     }, {immediate: true});
     watch(() => trainStation.value.outTime, () => {
+      // 停车时间=出站时间-入站时间
       let diff = dayjs(trainStation.value.outTime, 'HH:mm:ss').diff(dayjs(trainStation.value.inTime, 'HH:mm:ss'), 'seconds');
       trainStation.value.stopTime = dayjs('00:00:00', 'HH:mm:ss').second(diff).format('HH:mm:ss');
     }, {immediate: true});
