@@ -5,14 +5,14 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.steve.train.common.resp.PageResp;
-import com.steve.train.common.util.SnowFlakeUtil;
 import com.steve.train.business.domain.TrainSeat;
 import com.steve.train.business.domain.TrainSeatExample;
 import com.steve.train.business.mapper.TrainSeatMapper;
 import com.steve.train.business.req.TrainSeatQueryReq;
 import com.steve.train.business.req.TrainSeatSaveReq;
 import com.steve.train.business.resp.TrainSeatQueryResp;
+import com.steve.train.common.resp.PageResp;
+import com.steve.train.common.util.SnowFlakeUtil;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +49,12 @@ public class TrainSeatService {
 
     public PageResp<TrainSeatQueryResp> queryList(TrainSeatQueryReq req) {
         TrainSeatExample trainSeatExample = new TrainSeatExample();
-        trainSeatExample.setOrderByClause("id desc");
+        trainSeatExample.setOrderByClause("train_code asc, carriage_index asc, carriage_seat_index asc");
         TrainSeatExample.Criteria criteria = trainSeatExample.createCriteria();
-
+        // 若请求封装类的trainCode不为空，则是搜索请求
+        if (ObjectUtil.isNotNull(req.getTrainCode())) {
+            criteria.andTrainCodeEqualTo(req.getTrainCode());
+        }
         LOG.info("查询页码：{}", req.getPage());
         LOG.info("每页条数：{}", req.getSize());
         PageHelper.startPage(req.getPage(), req.getSize());
