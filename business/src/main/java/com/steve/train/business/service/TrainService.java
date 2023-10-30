@@ -1,6 +1,7 @@
 package com.steve.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
@@ -11,6 +12,8 @@ import com.steve.train.business.mapper.TrainMapper;
 import com.steve.train.business.req.TrainQueryReq;
 import com.steve.train.business.req.TrainSaveReq;
 import com.steve.train.business.resp.TrainQueryResp;
+import com.steve.train.common.exception.BusinessException;
+import com.steve.train.common.exception.BusinessExceptionEnum;
 import com.steve.train.common.resp.PageResp;
 import com.steve.train.common.util.SnowFlakeUtil;
 import jakarta.annotation.Resource;
@@ -37,6 +40,10 @@ public class TrainService {
         DateTime now = DateTime.now();
         Train train = BeanUtil.copyProperties(req, Train.class);
         if (ObjectUtil.isNull(train.getId())) {
+            Train trainDB = selectByUnique(req.getCode());
+            if (ObjectUtil.isNotEmpty(trainDB)) {
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_TRAIN_CODE_UNIQUE_ERROR);
+            }
             train.setId(SnowFlakeUtil.getSnowFlakeNextId());
             train.setCreateTime(now);
             train.setUpdateTime(now);
@@ -67,6 +74,17 @@ public class TrainService {
         pageResp.setTotal(pageInfo.getTotal());
         pageResp.setList(list);
         return pageResp;
+    }
+
+    private Train selectByUnique(String code) {
+        TrainExample trainExample = new TrainExample();
+        trainExample.createCriteria().andCodeEqualTo(code);
+        List<Train> list = trainMapper.selectByExample(trainExample);
+        if (CollUtil.isNotEmpty(list)) {
+            return list.get(0);
+        } else {
+            return null;
+        }
     }
 
     public void delete(Long id) {

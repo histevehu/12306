@@ -1,6 +1,7 @@
 package com.steve.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
@@ -12,6 +13,8 @@ import com.steve.train.business.req.TrainCarriageQueryReq;
 import com.steve.train.business.req.TrainCarriageSaveReq;
 import com.steve.train.business.resp.TrainCarriageQueryResp;
 import com.steve.train.common.enums.SeatColEnum;
+import com.steve.train.common.exception.BusinessException;
+import com.steve.train.common.exception.BusinessExceptionEnum;
 import com.steve.train.common.resp.PageResp;
 import com.steve.train.common.util.SnowFlakeUtil;
 import jakarta.annotation.Resource;
@@ -43,6 +46,11 @@ public class TrainCarriageService {
 
         TrainCarriage trainCarriage = BeanUtil.copyProperties(req, TrainCarriage.class);
         if (ObjectUtil.isNull(trainCarriage.getId())) {
+            // 保存之前，先校验唯一键是否存在
+            TrainCarriage trainCarriageDB = selectByUnique(req.getTrainCode(), req.getIndex());
+            if (ObjectUtil.isNotEmpty(trainCarriageDB)) {
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_TRAIN_CARRIAGE_INDEX_UNIQUE_ERROR);
+            }
             trainCarriage.setId(SnowFlakeUtil.getSnowFlakeNextId());
             trainCarriage.setCreateTime(now);
             trainCarriage.setUpdateTime(now);
@@ -76,6 +84,19 @@ public class TrainCarriageService {
         pageResp.setTotal(pageInfo.getTotal());
         pageResp.setList(list);
         return pageResp;
+    }
+
+    private TrainCarriage selectByUnique(String trainCode, Integer index) {
+        TrainCarriageExample trainCarriageExample = new TrainCarriageExample();
+        trainCarriageExample.createCriteria()
+                .andTrainCodeEqualTo(trainCode)
+                .andIndexEqualTo(index);
+        List<TrainCarriage> list = trainCarriageMapper.selectByExample(trainCarriageExample);
+        if (CollUtil.isNotEmpty(list)) {
+            return list.get(0);
+        } else {
+            return null;
+        }
     }
 
     public void delete(Long id) {

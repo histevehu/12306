@@ -1,6 +1,7 @@
 package com.steve.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
@@ -11,6 +12,8 @@ import com.steve.train.business.mapper.StationMapper;
 import com.steve.train.business.req.StationQueryReq;
 import com.steve.train.business.req.StationSaveReq;
 import com.steve.train.business.resp.StationQueryResp;
+import com.steve.train.common.exception.BusinessException;
+import com.steve.train.common.exception.BusinessExceptionEnum;
 import com.steve.train.common.resp.PageResp;
 import com.steve.train.common.util.SnowFlakeUtil;
 import jakarta.annotation.Resource;
@@ -36,14 +39,38 @@ public class StationService {
     public void save(StationSaveReq req) {
         DateTime now = DateTime.now();
         Station station = BeanUtil.copyProperties(req, Station.class);
+        // 若ID为空，则为新增记录
         if (ObjectUtil.isNull(station.getId())) {
+            // 首先查询唯一键站名是否已经存在
+            Station stationDB = selectByUnique(req.getName());
+            // 若站名已经存在，抛出异常
+            if (ObjectUtil.isNotEmpty(stationDB)) {
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_STATION_NAME_UNIQUE_ERROR);
+            }
+
             station.setId(SnowFlakeUtil.getSnowFlakeNextId());
             station.setCreateTime(now);
             station.setUpdateTime(now);
             stationMapper.insert(station);
-        } else {
+        }
+        // 否则是修改记录
+        else {
             station.setUpdateTime(now);
             stationMapper.updateByPrimaryKey(station);
+        }
+    }
+
+    /**
+     * 查找唯一键是否存在
+     */
+    private Station selectByUnique(String name) {
+        StationExample stationExample = new StationExample();
+        stationExample.createCriteria().andNameEqualTo(name);
+        List<Station> list = stationMapper.selectByExample(stationExample);
+        if (CollUtil.isNotEmpty(list)) {
+            return list.get(0);
+        } else {
+            return null;
         }
     }
 
