@@ -15,6 +15,7 @@
       </template>
       <template v-else-if="column.dataIndex === 'col'">
         <span v-for="item in SEAT_COL_ARRAY" :key="item.code">
+          <!--只有当座位代码（ABCDF...）和类型（一等座、二等座...）都匹配时才对应-->
           <span v-if="item.code === record.col && item.type === record.seatType">
             {{ item.desc }}
           </span>

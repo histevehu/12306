@@ -207,7 +207,7 @@ export default defineComponent({
         params: {
           page: param.page,
           size: param.size,
-          trainCode: params.trainCode,
+          trainCode: params.value.trainCode,
         }
       }).then((response) => {
         loading.value = false;

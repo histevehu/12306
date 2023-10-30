@@ -11,6 +11,7 @@ import com.steve.train.business.mapper.TrainCarriageMapper;
 import com.steve.train.business.req.TrainCarriageQueryReq;
 import com.steve.train.business.req.TrainCarriageSaveReq;
 import com.steve.train.business.resp.TrainCarriageQueryResp;
+import com.steve.train.common.enums.SeatColEnum;
 import com.steve.train.common.resp.PageResp;
 import com.steve.train.common.util.SnowFlakeUtil;
 import jakarta.annotation.Resource;
@@ -35,6 +36,11 @@ public class TrainCarriageService {
 
     public void save(TrainCarriageSaveReq req) {
         DateTime now = DateTime.now();
+        // 自动计算出列数和总座位数
+        List<SeatColEnum> seatColEnums = SeatColEnum.getColsByType(req.getSeatType());
+        req.setColCount(seatColEnums.size());
+        req.setSeatCount(req.getColCount() * req.getRowCount());
+
         TrainCarriage trainCarriage = BeanUtil.copyProperties(req, TrainCarriage.class);
         if (ObjectUtil.isNull(trainCarriage.getId())) {
             trainCarriage.setId(SnowFlakeUtil.getSnowFlakeNextId());
