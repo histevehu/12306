@@ -1,14 +1,16 @@
 package com.steve.train.business.controller.admin;
 
-import com.steve.train.common.resp.CommonResp;
-import com.steve.train.common.resp.PageResp;
 import com.steve.train.business.req.StationQueryReq;
 import com.steve.train.business.req.StationSaveReq;
 import com.steve.train.business.resp.StationQueryResp;
 import com.steve.train.business.service.StationService;
+import com.steve.train.common.resp.CommonResp;
+import com.steve.train.common.resp.PageResp;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /*
  * @author     : Steve Hu
@@ -38,6 +40,12 @@ public class StationAdminController {
     public CommonResp<Object> delete(@PathVariable Long id) {
         stationService.delete(id);
         return new CommonResp<>();
+    }
+
+    @GetMapping("/queryAll")
+    public CommonResp<List<StationQueryResp>> queryAll() {
+        List<StationQueryResp> list = stationService.queryList();
+        return new CommonResp<>(list);
     }
 
 }

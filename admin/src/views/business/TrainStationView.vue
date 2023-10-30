@@ -1,7 +1,8 @@
 <template>
   <p>
     <a-space>
-      <a-button type="primary" @click="handleQuery()">刷新</a-button>
+      <train-select-view v-model="params.trainCode" width="200px"></train-select-view>
+      <a-button type="primary" @click="handleQuery()">查找</a-button>
       <a-button type="primary" @click="onAdd">新增</a-button>
     </a-space>
   </p>
@@ -30,13 +31,15 @@
       <a-form-item label="车次编号">
         <!--可向组件传入自定义参数width，也可以写作 :width="'100%'"-->
         <!--可向组件传入自定义事件，例如 @change="XXX"-->
+        <!--注意：v-model:value这个是给value这个属性赋值，你可以把value看成是一个普通的属性，再换成另一个普通的属性，写法是一样的，比如我们自定义组件有加v-model:width，就是给width属性赋值。
+        而我们自定义的组件里没有value属性，所以不写成v-model:value。antdv的组件都用了v-model:value，因为这些组件都绑定了value属性-->
         <TrainSelectView v-model="trainStation.trainCode" width="100%" @change=""></TrainSelectView>
       </a-form-item>
       <a-form-item label="站序">
         <a-input v-model:value="trainStation.index"/>
       </a-form-item>
       <a-form-item label="站名">
-        <a-input v-model:value="trainStation.name"/>
+        <StationSelectView v-model="trainStation.name"/>
       </a-form-item>
       <a-form-item label="站名拼音">
         <a-input v-model:value="trainStation.namePinyin" disabled/>
@@ -66,10 +69,11 @@ import {notification} from "ant-design-vue";
 import axios from "axios";
 import {pinyin} from "pinyin-pro";
 import TrainSelectView from "@/components/TrainSelect.vue";
+import StationSelectView from "@/components/StationSelect.vue";
 
 export default defineComponent({
   name: "TrainStationView",
-  components: {TrainSelectView},
+  components: {StationSelectView, TrainSelectView},
   setup() {
     const visible = ref(false);
     let trainStation = ref({
@@ -93,6 +97,9 @@ export default defineComponent({
       pageSize: 10,
     });
     let loading = ref(false);
+    let params = ref({
+      trainCode: null
+    });
     const columns = [
       {
         title: '车次编号',
@@ -199,7 +206,8 @@ export default defineComponent({
       axios.get("/business/admin/trainStation/queryList", {
         params: {
           page: param.page,
-          size: param.size
+          size: param.size,
+          trainCode: params.trainCode,
         }
       }).then((response) => {
         loading.value = false;
@@ -242,7 +250,8 @@ export default defineComponent({
       onAdd,
       handleOk,
       onEdit,
-      onDelete
+      onDelete,
+      params
     };
   },
 });
