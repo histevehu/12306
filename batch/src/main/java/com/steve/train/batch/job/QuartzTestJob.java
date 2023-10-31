@@ -1,9 +1,9 @@
-package com.steve.train.business.job;
+package com.steve.train.batch.job;
 
 /*
  * @author     : Steve Hu
  * @date       : 2023/10/30 19:14
- * @description: Quartz定时调度模块测试
+ * @description: Quartz定时调度模块测试，需要配合QuartzConfig类使用
  */
 
 import org.quartz.Job;

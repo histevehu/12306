@@ -1,4 +1,4 @@
-package com.steve.train.business.job;
+package com.steve.train.batch.job;
 
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;

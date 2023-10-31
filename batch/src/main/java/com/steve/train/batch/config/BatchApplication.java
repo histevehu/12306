@@ -1,4 +1,4 @@
-package com.steve.train.business.config;
+package com.steve.train.batch.config;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ import org.springframework.core.env.Environment;
 @ComponentScan("com.steve")
 // 持久层的Java代码放在mapper中，xml配置文件放在resources的mapper中
 // 通过配置MapperScan让Spring扫描MyBatis的代码
-@MapperScan("com.steve.train.business.mapper")
+@MapperScan("com.steve.train.batch.mapper")
 public class BatchApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatchApplication.class);

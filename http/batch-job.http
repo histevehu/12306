@@ -1,0 +1,65 @@
+POST http://localhost:8000/batch/admin/job/add
+Content-Type: application/json
+
+{
+  "name": "com.steve.train.batch.job.QuartzTestJob",
+  "jobGroupName": "default",
+  "cronExpression": "*/2 * * * * ?",
+  "desc": "test job"
+}
+
+###
+
+GET http://localhost:8000/batch/admin/job/query
+
+###
+
+POST http://localhost:8000/batch/admin/job/pause
+Content-Type: application/json
+
+{
+  "name": "com.steve.train.batch.job.TestJob",
+  "jobGroupName": "default"
+}
+
+###
+
+POST http://localhost:8000/batch/admin/job/resume
+Content-Type: application/json
+
+{
+  "name": "com.steve.train.batch.job.TestJob",
+  "jobGroupName": "default"
+}
+
+###
+
+POST http://localhost:8000/batch/admin/job/reschedule
+Content-Type: application/json
+
+{
+"name": "com.steve.train.batch.job.TestJob",
+"jobGroupName": "default",
+"cronExpression": "*/5 * * * * ?",
+"desc": "test job"
+}
+
+###
+
+POST http://localhost:8000/batch/admin/job/delete
+Content-Type: application/json
+
+{
+"name": "com.steve.train.batch.job.TestJob",
+"jobGroupName": "default"
+}
+
+###
+
+POST http://localhost:8000/batch/admin/job/run
+Content-Type: application/json
+
+{
+"name": "com.steve.train.batch.job.DailyTrainJob",
+"jobGroupName": "default"
+}
