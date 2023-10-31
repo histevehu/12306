@@ -32,11 +32,17 @@ const routes = [{
         {
             path: 'trainSeat',
             component: () => import('../views/business/TrainSeatView.vue')
-        }]
+        }, {
+            path: 'batch/',
+            children: [{
+                path: 'job',
+                component: () => import('../views/batch/JobView.vue')
+            }]
+        },]
 }, {
     path: '',
     redirect: '/welcome'
-}]
+},]
 
 const router = createRouter({
     history: createWebHistory(process.env.BASE_URL), routes
