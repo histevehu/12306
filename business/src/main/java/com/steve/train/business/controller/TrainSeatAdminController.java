@@ -1,4 +1,4 @@
-package com.steve.train.business.controller.admin;
+package com.steve.train.business.controller;
 
 import com.steve.train.common.resp.CommonResp;
 import com.steve.train.common.resp.PageResp;

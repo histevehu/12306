@@ -38,6 +38,17 @@
             <groupId>com.steve</groupId>
             <artifactId>common</artifactId>
         </dependency>
+        <!--远程调用openfeign-->
+        <!--OpenFeign是在Feign的基础上，增加SpringMVC注解，让代码写起来像在写controller-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <!--openfeign默认使用的是loadBalance的负载均衡器  -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-loadbalancer</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
