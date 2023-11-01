@@ -10,8 +10,9 @@ import java.util.Date;
 
 // @Feign声明此为feign客户端，将发起请求
 // 若未引入注册中心，想要将两个模块应用的spring.application.name相关联调用，可以通过url参数
-@FeignClient(name = "business", url = "http://127.0.0.1:8082/business")
+@FeignClient(name = "business", url = "http://127.0.0.1:8082/business/admin")
 public interface BusinessFeign {
-    @GetMapping("/business/admin/dailyTrain/genDaily/{date}")
+    // 对business发起get请求
+    @GetMapping("/dailyTrain/genDaily/{date}")
     CommonResp<Object> genDaily(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date);
 }

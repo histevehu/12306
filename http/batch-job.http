@@ -2,10 +2,10 @@ POST http://localhost:8000/batch/admin/job/add
 Content-Type: application/json
 
 {
-  "name": "com.steve.train.batch.job.QuartzTestJob",
+  "name": "com.steve.train.batch.job.DailyTrainJob",
   "jobGroupName": "default",
-  "cronExpression": "*/2 * * * * ?",
-  "desc": "test job"
+  "cronExpression": "0 0 0 1/1 * ? ",
+  "desc": "Daily Train Generation"
 }
 
 ###

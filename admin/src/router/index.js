@@ -40,7 +40,7 @@ const routes = [{
             path: 'business/',
             children: [{
                 path: 'dailyTrain',
-                component: () => import('../views/business/./DailyTrainStation')
+                component: () => import('../views/business/DailyTrainView.vue')
             }, {
                 path: 'dailyTrainStation',
                 component: () => import('../views/business/DailyTrainStationView.vue')

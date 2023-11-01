@@ -25,7 +25,7 @@ public class BatchApplication {
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(BatchApplication.class);
         Environment env = app.run(args).getEnvironment();
-        LOG.info("Business Application，启动！");
+        LOG.info("Batch Application，启动！");
         LOG.info("Root URL: http://localhost:{}{}", env.getProperty("server.port"), env.getProperty("server.servlet.context-path"));
     }
 

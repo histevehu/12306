@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 // @DisallowConcurrentExecution
 // @Configuration
 /**
- * 声明式声明定时调度任务触发器
+ * Quartz声明式声明定时调度任务触发器
  * 注意：实际应用中，我们不会像下面这样在代码中显式声明定时调度任务，而是使用数据库模式，在控制台页面动态管理
  */
 public class QuartzConfig {
