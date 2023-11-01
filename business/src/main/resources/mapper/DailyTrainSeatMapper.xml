@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.steve.train.business.mapper.DailyTrainSeatMapper">
+  <resultMap id="BaseResultMap" type="com.steve.train.business.domain.DailyTrainSeat">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="date" jdbcType="DATE" property="date" />
+    <result column="train_code" jdbcType="VARCHAR" property="trainCode" />
+    <result column="carriage_index" jdbcType="INTEGER" property="carriageIndex" />
+    <result column="row" jdbcType="CHAR" property="row" />
+    <result column="col" jdbcType="CHAR" property="col" />
+    <result column="seat_type" jdbcType="CHAR" property="seatType" />
+    <result column="carriage_seat_index" jdbcType="INTEGER" property="carriageSeatIndex" />
+    <result column="sell" jdbcType="VARCHAR" property="sell" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, `date`, train_code, carriage_index, `row`, col, seat_type, carriage_seat_index, 
+    sell, create_time, update_time
+  </sql>
+  <select id="selectByExample" parameterType="com.steve.train.business.domain.DailyTrainSeatExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from daily_train_seat
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from daily_train_seat
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from daily_train_seat
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.steve.train.business.domain.DailyTrainSeatExample">
+    delete from daily_train_seat
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.steve.train.business.domain.DailyTrainSeat">
+    insert into daily_train_seat (id, `date`, train_code, 
+      carriage_index, `row`, col, 
+      seat_type, carriage_seat_index, sell, 
+      create_time, update_time)
+    values (#{id,jdbcType=BIGINT}, #{date,jdbcType=DATE}, #{trainCode,jdbcType=VARCHAR}, 
+      #{carriageIndex,jdbcType=INTEGER}, #{row,jdbcType=CHAR}, #{col,jdbcType=CHAR}, 
+      #{seatType,jdbcType=CHAR}, #{carriageSeatIndex,jdbcType=INTEGER}, #{sell,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.steve.train.business.domain.DailyTrainSeat">
+    insert into daily_train_seat
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="date != null">
+        `date`,
+      </if>
+      <if test="trainCode != null">
+        train_code,
+      </if>
+      <if test="carriageIndex != null">
+        carriage_index,
+      </if>
+      <if test="row != null">
+        `row`,
+      </if>
+      <if test="col != null">
+        col,
+      </if>
+      <if test="seatType != null">
+        seat_type,
+      </if>
+      <if test="carriageSeatIndex != null">
+        carriage_seat_index,
+      </if>
+      <if test="sell != null">
+        sell,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="date != null">
+        #{date,jdbcType=DATE},
+      </if>
+      <if test="trainCode != null">
+        #{trainCode,jdbcType=VARCHAR},
+      </if>
+      <if test="carriageIndex != null">
+        #{carriageIndex,jdbcType=INTEGER},
+      </if>
+      <if test="row != null">
+        #{row,jdbcType=CHAR},
+      </if>
+      <if test="col != null">
+        #{col,jdbcType=CHAR},
+      </if>
+      <if test="seatType != null">
+        #{seatType,jdbcType=CHAR},
+      </if>
+      <if test="carriageSeatIndex != null">
+        #{carriageSeatIndex,jdbcType=INTEGER},
+      </if>
+      <if test="sell != null">
+        #{sell,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.steve.train.business.domain.DailyTrainSeatExample" resultType="java.lang.Long">
+    select count(*) from daily_train_seat
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update daily_train_seat
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.date != null">
+        `date` = #{record.date,jdbcType=DATE},
+      </if>
+      <if test="record.trainCode != null">
+        train_code = #{record.trainCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.carriageIndex != null">
+        carriage_index = #{record.carriageIndex,jdbcType=INTEGER},
+      </if>
+      <if test="record.row != null">
+        `row` = #{record.row,jdbcType=CHAR},
+      </if>
+      <if test="record.col != null">
+        col = #{record.col,jdbcType=CHAR},
+      </if>
+      <if test="record.seatType != null">
+        seat_type = #{record.seatType,jdbcType=CHAR},
+      </if>
+      <if test="record.carriageSeatIndex != null">
+        carriage_seat_index = #{record.carriageSeatIndex,jdbcType=INTEGER},
+      </if>
+      <if test="record.sell != null">
+        sell = #{record.sell,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update daily_train_seat
+    set id = #{record.id,jdbcType=BIGINT},
+      `date` = #{record.date,jdbcType=DATE},
+      train_code = #{record.trainCode,jdbcType=VARCHAR},
+      carriage_index = #{record.carriageIndex,jdbcType=INTEGER},
+      `row` = #{record.row,jdbcType=CHAR},
+      col = #{record.col,jdbcType=CHAR},
+      seat_type = #{record.seatType,jdbcType=CHAR},
+      carriage_seat_index = #{record.carriageSeatIndex,jdbcType=INTEGER},
+      sell = #{record.sell,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.steve.train.business.domain.DailyTrainSeat">
+    update daily_train_seat
+    <set>
+      <if test="date != null">
+        `date` = #{date,jdbcType=DATE},
+      </if>
+      <if test="trainCode != null">
+        train_code = #{trainCode,jdbcType=VARCHAR},
+      </if>
+      <if test="carriageIndex != null">
+        carriage_index = #{carriageIndex,jdbcType=INTEGER},
+      </if>
+      <if test="row != null">
+        `row` = #{row,jdbcType=CHAR},
+      </if>
+      <if test="col != null">
+        col = #{col,jdbcType=CHAR},
+      </if>
+      <if test="seatType != null">
+        seat_type = #{seatType,jdbcType=CHAR},
+      </if>
+      <if test="carriageSeatIndex != null">
+        carriage_seat_index = #{carriageSeatIndex,jdbcType=INTEGER},
+      </if>
+      <if test="sell != null">
+        sell = #{sell,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.steve.train.business.domain.DailyTrainSeat">
+    update daily_train_seat
+    set `date` = #{date,jdbcType=DATE},
+      train_code = #{trainCode,jdbcType=VARCHAR},
+      carriage_index = #{carriageIndex,jdbcType=INTEGER},
+      `row` = #{row,jdbcType=CHAR},
+      col = #{col,jdbcType=CHAR},
+      seat_type = #{seatType,jdbcType=CHAR},
+      carriage_seat_index = #{carriageSeatIndex,jdbcType=INTEGER},
+      sell = #{sell,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

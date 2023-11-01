@@ -40,13 +40,16 @@ const routes = [{
             path: 'business/',
             children: [{
                 path: 'dailyTrain',
-                component: () => import('../views/business/DailyTrainView.vue')
+                component: () => import('../views/business/./DailyTrainStation')
             }, {
                 path: 'dailyTrainStation',
                 component: () => import('../views/business/DailyTrainStationView.vue')
             }, {
                 path: 'dailyTrainCarriage',
                 component: () => import('../views/business/DailyTrainCarriageView.vue')
+            }, {
+                path: 'dailyTrainSeat',
+                component: () => import('../views/business/DailyTrainSeatView.vue')
             }]
         },
         {

@@ -89,7 +89,7 @@ import TrainSelectView from "@/components/TrainSelect";
 import dayjs from 'dayjs';
 
 export default defineComponent({
-  name: "daily-train-view",
+  name: "DailyTrainStation",
   components: {TrainSelectView},
   setup() {
     const TRAIN_TYPE_ARRAY = window.TRAIN_TYPE_ARRAY;
