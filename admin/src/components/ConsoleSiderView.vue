@@ -5,7 +5,7 @@
         v-model:selectedKeys="selectedKeys"
         mode="inline"
         :style="{ height: '100%', borderRight: 0 }"
-        :open-keys="['base','batch']"
+        :open-keys="['base','business','batch']"
     >
       <a-sub-menu key="base">
         <template #title>
@@ -42,6 +42,21 @@
           <router-link to="/base/trainSeat">
             <MenuUnfoldOutlined/>
             座位管理
+          </router-link>
+        </a-menu-item>
+      </a-sub-menu>
+
+      <a-sub-menu key="business">
+        <template #title>
+          <span>
+            <UnorderedListOutlined/>
+            业务信息
+          </span>
+        </template>
+        <a-menu-item key="/business/dailyTrain">
+          <router-link to="/business/dailyTrain">
+            <MenuUnfoldOutlined/>
+            每日车次管理
           </router-link>
         </a-menu-item>
       </a-sub-menu>

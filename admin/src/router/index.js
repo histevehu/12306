@@ -17,24 +17,31 @@ const routes = [{
             path: 'base/',
             children: [{
                 path: 'station',
-                component: () => import('../views/business/StationView.vue')
+                component: () => import('../views/base/StationView.vue')
             },
                 {
                     path: 'train',
-                    component: () => import('../views/business/TrainView.vue')
+                    component: () => import('../views/base/TrainView.vue')
                 },
                 {
                     path: 'trainStation',
-                    component: () => import('../views/business/TrainStationView.vue')
+                    component: () => import('../views/base/TrainStationView.vue')
                 },
                 {
                     path: 'trainCarriage',
-                    component: () => import('../views/business/TrainCarriageView.vue')
+                    component: () => import('../views/base/TrainCarriageView.vue')
                 },
                 {
                     path: 'trainSeat',
-                    component: () => import('../views/business/TrainSeatView.vue')
+                    component: () => import('../views/base/TrainSeatView.vue')
                 },]
+        },
+        {
+            path: 'business/',
+            children: [{
+                path: 'dailyTrain',
+                component: () => import('../views/business/DailyTrainView.vue')
+            }]
         },
         {
             path: 'batch/',
