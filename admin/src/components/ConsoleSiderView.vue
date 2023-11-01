@@ -65,6 +65,12 @@
             每日车站管理
           </router-link>
         </a-menu-item>
+        <a-menu-item key="/business/dailyTrainCarriage">
+          <router-link to="/business/dailyTrainCarriage">
+            <MenuUnfoldOutlined/>
+            每日车厢管理
+          </router-link>
+        </a-menu-item>
       </a-sub-menu>
 
       <a-sub-menu key="batch">
