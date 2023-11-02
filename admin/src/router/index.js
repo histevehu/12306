@@ -50,6 +50,9 @@ const routes = [{
             }, {
                 path: 'dailyTrainSeat',
                 component: () => import('../views/business/DailyTrainSeatView.vue')
+            }, {
+                path: 'dailyTrainTicket',
+                component: () => import('../views/business/DailyTrainTicketView.vue')
             }]
         },
         {

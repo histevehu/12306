@@ -53,6 +53,12 @@
             业务信息
           </span>
         </template>
+        <a-menu-item key="/business/dailyTrainTicket">
+          <router-link to="/business/dailyTrainTicket">
+            <MenuUnfoldOutlined/>
+            余票信息
+          </router-link>
+        </a-menu-item>
         <a-menu-item key="/business/dailyTrain">
           <router-link to="/business/dailyTrain">
             <MenuUnfoldOutlined/>

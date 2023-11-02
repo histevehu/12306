@@ -168,6 +168,7 @@ create table `daily_train_seat`
 ) engine = innodb
   default charset = utf8mb4 comment ='每日座位';
 
+# 余票查询会显示还有多少张票。如果实时通过每个座位的sell字段计算，会影响性能，所以应该I另外做张表，直接存储余票数量
 drop table if exists `daily_train_ticket`;
 create table `daily_train_ticket`
 (

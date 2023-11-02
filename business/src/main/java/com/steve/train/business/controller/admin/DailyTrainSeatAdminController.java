@@ -1,11 +1,11 @@
 package com.steve.train.business.controller.admin;
 
-import com.steve.train.common.resp.CommonResp;
-import com.steve.train.common.resp.PageResp;
 import com.steve.train.business.req.DailyTrainSeatQueryReq;
 import com.steve.train.business.req.DailyTrainSeatSaveReq;
 import com.steve.train.business.resp.DailyTrainSeatQueryResp;
 import com.steve.train.business.service.DailyTrainSeatService;
+import com.steve.train.common.resp.CommonResp;
+import com.steve.train.common.resp.PageResp;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;

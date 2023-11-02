@@ -2,8 +2,9 @@ package com.steve.train.business.mapper;
 
 import com.steve.train.business.domain.TrainSeat;
 import com.steve.train.business.domain.TrainSeatExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface TrainSeatMapper {
     long countByExample(TrainSeatExample example);

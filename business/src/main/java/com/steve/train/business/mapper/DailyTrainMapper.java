@@ -2,8 +2,9 @@ package com.steve.train.business.mapper;
 
 import com.steve.train.business.domain.DailyTrain;
 import com.steve.train.business.domain.DailyTrainExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface DailyTrainMapper {
     long countByExample(DailyTrainExample example);

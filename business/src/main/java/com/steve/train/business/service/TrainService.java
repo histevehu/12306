@@ -101,6 +101,7 @@ public class TrainService {
 
     /**
      * 开发规范：selectAll方法名意为用数据库语言进行处理，因此返回数据库实体类
+     *
      * @return
      */
     public List<Train> selectAll() {

@@ -1,9 +1,10 @@
 package com.steve.train.business.resp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /*
  * @author     : Steve Hu
@@ -21,7 +22,7 @@ public class DailyTrainCarriageQueryResp {
     /**
      * 日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date date;
 
     /**
@@ -57,13 +58,13 @@ public class DailyTrainCarriageQueryResp {
     /**
      * 新增时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**
      * 修改时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     public Long getId() {
