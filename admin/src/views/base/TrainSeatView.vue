@@ -129,11 +129,12 @@ export default defineComponent({
       });
     };
 
-    const handleTableChange = (pagination) => {
-      // console.log("看看自带的分页参数都有啥：" + pagination);
+    // table的分页绑定的是pagination这个响应式变量，所以想改变表格的每页条数，就得改变pagination的pageSize
+    const handleTableChange = (page) => {
+      pagination.value.pageSize = page.pageSize;
       handleQuery({
-        page: pagination.current,
-        size: pagination.pageSize
+        page: page.current,
+        size: page.pageSize
       });
     };
 
