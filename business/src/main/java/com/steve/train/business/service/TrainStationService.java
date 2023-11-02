@@ -110,4 +110,12 @@ public class TrainStationService {
     public void delete(Long id) {
         trainStationMapper.deleteByPrimaryKey(id);
     }
+
+    public List<TrainStation> selectByTrainCode(String trainCode) {
+        TrainStationExample trainStationExample = new TrainStationExample();
+        trainStationExample.setOrderByClause("`index` asc");
+        trainStationExample.createCriteria().andTrainCodeEqualTo(trainCode);
+        // mybatis查询列表，如果没数据，返回的是空列表，不是null, 这样可以避免空指针异常
+        return trainStationMapper.selectByExample(trainStationExample);
+    }
 }
