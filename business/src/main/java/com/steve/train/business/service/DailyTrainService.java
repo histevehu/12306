@@ -50,6 +50,9 @@ public class DailyTrainService {
     @Resource
     private DailyTrainSeatService dailyTrainSeatService;
 
+    @Resource
+    private DailyTrainTicketService dailyTrainTicketService;
+
 
     public void save(DailyTrainSaveReq req) {
         DateTime now = DateTime.now();
@@ -115,19 +118,19 @@ public class DailyTrainService {
     }
 
     /**
-     * 封装实现生成指定日期的火车信息，包括车次、车站、车厢、座位
+     * 封装实现生成指定日期的火车信息，包括车次、车站、车厢、座位、余票信息
      *
      * @param date
      * @param train
      */
+    // 开发规范-事务嵌套：A事务中包含B子事务，那么子事务没必要加@Transactional，只要确保A加了就能起到回滚作用。
+    //                但是良好的开发规范是为每个子事务也都加上。
     @Transactional
     public void genDailyTrain(Date date, Train train) {
         LOG.info("生成日期【{}】车次【{}】的信息开始", DateUtil.formatDate(date), train.getCode());
         // 删除该车次已有的数据
         DailyTrainExample dailyTrainExample = new DailyTrainExample();
-        dailyTrainExample.createCriteria()
-                .andDateEqualTo(date)
-                .andCodeEqualTo(train.getCode());
+        dailyTrainExample.createCriteria().andDateEqualTo(date).andCodeEqualTo(train.getCode());
         dailyTrainMapper.deleteByExample(dailyTrainExample);
 
         // 生成该车次的数据
@@ -138,13 +141,15 @@ public class DailyTrainService {
         dailyTrain.setUpdateTime(now);
         dailyTrain.setDate(date);
         dailyTrainMapper.insert(dailyTrain);
-
+        // 下面的子事务，可以不用加@Transactional，只要确保本父事务加了就行。
         // 生成该车次的车站数据
         dailyTrainStationService.genDaily(date, train.getCode());
         // 生成该车次的车厢数据
         dailyTrainCarriageService.genDaily(date, train.getCode());
         // 生成该车次的座位数据
         dailyTrainSeatService.genDaily(date, train.getCode());
+        // 生成该车次的余票数据
+        dailyTrainTicketService.genDaily(dailyTrain, date, train.getCode());
 
         LOG.info("生成日期【{}】车次【{}】的信息结束", DateUtil.formatDate(date), train.getCode());
     }

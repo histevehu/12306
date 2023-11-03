@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.steve.train.business.mapper.DailyTrainTicketMapper">
+    <resultMap id="BaseResultMap" type="com.steve.train.business.domain.DailyTrainTicket">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="date" jdbcType="DATE" property="date"/>
+        <result column="train_code" jdbcType="VARCHAR" property="trainCode"/>
+        <result column="start" jdbcType="VARCHAR" property="start"/>
+        <result column="start_pinyin" jdbcType="VARCHAR" property="startPinyin"/>
+        <result column="start_time" jdbcType="TIME" property="startTime"/>
+        <result column="start_index" jdbcType="INTEGER" property="startIndex"/>
+        <result column="end" jdbcType="VARCHAR" property="end"/>
+        <result column="end_pinyin" jdbcType="VARCHAR" property="endPinyin"/>
+        <result column="end_time" jdbcType="TIME" property="endTime"/>
+        <result column="end_index" jdbcType="INTEGER" property="endIndex"/>
+        <result column="ydz" jdbcType="INTEGER" property="ydz"/>
+        <result column="ydz_price" jdbcType="DECIMAL" property="ydzPrice"/>
+        <result column="edz" jdbcType="INTEGER" property="edz"/>
+        <result column="edz_price" jdbcType="DECIMAL" property="edzPrice"/>
+        <result column="rw" jdbcType="INTEGER" property="rw"/>
+        <result column="rw_price" jdbcType="DECIMAL" property="rwPrice"/>
+        <result column="yw" jdbcType="INTEGER" property="yw"/>
+        <result column="yw_price" jdbcType="DECIMAL" property="ywPrice"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, `date`, train_code, `start`, start_pinyin, start_time, start_index, `end`, end_pinyin,
+    end_time, end_index, ydz, ydz_price, edz, edz_price, rw, rw_price, yw, yw_price, 
+    create_time, update_time
+    </sql>
+    <select id="selectByExample" parameterType="com.steve.train.business.domain.DailyTrainTicketExample"
+            resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from daily_train_ticket
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from daily_train_ticket
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from daily_train_ticket
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.steve.train.business.domain.DailyTrainTicketExample">
+        delete from daily_train_ticket
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.steve.train.business.domain.DailyTrainTicket">
+        insert into daily_train_ticket (id, `date`, train_code,
+                                        `start`, start_pinyin, start_time,
+                                        start_index, `end`, end_pinyin,
+                                        end_time, end_index, ydz,
+                                        ydz_price, edz, edz_price,
+                                        rw, rw_price, yw, yw_price,
+                                        create_time, update_time)
+        values (#{id,jdbcType=BIGINT}, #{date,jdbcType=DATE}, #{trainCode,jdbcType=VARCHAR},
+                #{start,jdbcType=VARCHAR}, #{startPinyin,jdbcType=VARCHAR}, #{startTime,jdbcType=TIME},
+                #{startIndex,jdbcType=INTEGER}, #{end,jdbcType=VARCHAR}, #{endPinyin,jdbcType=VARCHAR},
+                #{endTime,jdbcType=TIME}, #{endIndex,jdbcType=INTEGER}, #{ydz,jdbcType=INTEGER},
+                #{ydzPrice,jdbcType=DECIMAL}, #{edz,jdbcType=INTEGER}, #{edzPrice,jdbcType=DECIMAL},
+                #{rw,jdbcType=INTEGER}, #{rwPrice,jdbcType=DECIMAL}, #{yw,jdbcType=INTEGER},
+                #{ywPrice,jdbcType=DECIMAL},
+                #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.steve.train.business.domain.DailyTrainTicket">
+        insert into daily_train_ticket
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="date != null">
+                `date`,
+            </if>
+            <if test="trainCode != null">
+                train_code,
+            </if>
+            <if test="start != null">
+                `start`,
+            </if>
+            <if test="startPinyin != null">
+                start_pinyin,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="startIndex != null">
+                start_index,
+            </if>
+            <if test="end != null">
+                `end`,
+            </if>
+            <if test="endPinyin != null">
+                end_pinyin,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="endIndex != null">
+                end_index,
+            </if>
+            <if test="ydz != null">
+                ydz,
+            </if>
+            <if test="ydzPrice != null">
+                ydz_price,
+            </if>
+            <if test="edz != null">
+                edz,
+            </if>
+            <if test="edzPrice != null">
+                edz_price,
+            </if>
+            <if test="rw != null">
+                rw,
+            </if>
+            <if test="rwPrice != null">
+                rw_price,
+            </if>
+            <if test="yw != null">
+                yw,
+            </if>
+            <if test="ywPrice != null">
+                yw_price,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="date != null">
+                #{date,jdbcType=DATE},
+            </if>
+            <if test="trainCode != null">
+                #{trainCode,jdbcType=VARCHAR},
+            </if>
+            <if test="start != null">
+                #{start,jdbcType=VARCHAR},
+            </if>
+            <if test="startPinyin != null">
+                #{startPinyin,jdbcType=VARCHAR},
+            </if>
+            <if test="startTime != null">
+                #{startTime,jdbcType=TIME},
+            </if>
+            <if test="startIndex != null">
+                #{startIndex,jdbcType=INTEGER},
+            </if>
+            <if test="end != null">
+                #{end,jdbcType=VARCHAR},
+            </if>
+            <if test="endPinyin != null">
+                #{endPinyin,jdbcType=VARCHAR},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=TIME},
+            </if>
+            <if test="endIndex != null">
+                #{endIndex,jdbcType=INTEGER},
+            </if>
+            <if test="ydz != null">
+                #{ydz,jdbcType=INTEGER},
+            </if>
+            <if test="ydzPrice != null">
+                #{ydzPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="edz != null">
+                #{edz,jdbcType=INTEGER},
+            </if>
+            <if test="edzPrice != null">
+                #{edzPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="rw != null">
+                #{rw,jdbcType=INTEGER},
+            </if>
+            <if test="rwPrice != null">
+                #{rwPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="yw != null">
+                #{yw,jdbcType=INTEGER},
+            </if>
+            <if test="ywPrice != null">
+                #{ywPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.steve.train.business.domain.DailyTrainTicketExample"
+            resultType="java.lang.Long">
+        select count(*) from daily_train_ticket
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update daily_train_ticket
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.date != null">
+                `date` = #{record.date,jdbcType=DATE},
+            </if>
+            <if test="record.trainCode != null">
+                train_code = #{record.trainCode,jdbcType=VARCHAR},
+            </if>
+            <if test="record.start != null">
+                `start` = #{record.start,jdbcType=VARCHAR},
+            </if>
+            <if test="record.startPinyin != null">
+                start_pinyin = #{record.startPinyin,jdbcType=VARCHAR},
+            </if>
+            <if test="record.startTime != null">
+                start_time = #{record.startTime,jdbcType=TIME},
+            </if>
+            <if test="record.startIndex != null">
+                start_index = #{record.startIndex,jdbcType=INTEGER},
+            </if>
+            <if test="record.end != null">
+                `end` = #{record.end,jdbcType=VARCHAR},
+            </if>
+            <if test="record.endPinyin != null">
+                end_pinyin = #{record.endPinyin,jdbcType=VARCHAR},
+            </if>
+            <if test="record.endTime != null">
+                end_time = #{record.endTime,jdbcType=TIME},
+            </if>
+            <if test="record.endIndex != null">
+                end_index = #{record.endIndex,jdbcType=INTEGER},
+            </if>
+            <if test="record.ydz != null">
+                ydz = #{record.ydz,jdbcType=INTEGER},
+            </if>
+            <if test="record.ydzPrice != null">
+                ydz_price = #{record.ydzPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="record.edz != null">
+                edz = #{record.edz,jdbcType=INTEGER},
+            </if>
+            <if test="record.edzPrice != null">
+                edz_price = #{record.edzPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="record.rw != null">
+                rw = #{record.rw,jdbcType=INTEGER},
+            </if>
+            <if test="record.rwPrice != null">
+                rw_price = #{record.rwPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="record.yw != null">
+                yw = #{record.yw,jdbcType=INTEGER},
+            </if>
+            <if test="record.ywPrice != null">
+                yw_price = #{record.ywPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.updateTime != null">
+                update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update daily_train_ticket
+        set id = #{record.id,jdbcType=BIGINT},
+        `date` = #{record.date,jdbcType=DATE},
+        train_code = #{record.trainCode,jdbcType=VARCHAR},
+        `start` = #{record.start,jdbcType=VARCHAR},
+        start_pinyin = #{record.startPinyin,jdbcType=VARCHAR},
+        start_time = #{record.startTime,jdbcType=TIME},
+        start_index = #{record.startIndex,jdbcType=INTEGER},
+        `end` = #{record.end,jdbcType=VARCHAR},
+        end_pinyin = #{record.endPinyin,jdbcType=VARCHAR},
+        end_time = #{record.endTime,jdbcType=TIME},
+        end_index = #{record.endIndex,jdbcType=INTEGER},
+        ydz = #{record.ydz,jdbcType=INTEGER},
+        ydz_price = #{record.ydzPrice,jdbcType=DECIMAL},
+        edz = #{record.edz,jdbcType=INTEGER},
+        edz_price = #{record.edzPrice,jdbcType=DECIMAL},
+        rw = #{record.rw,jdbcType=INTEGER},
+        rw_price = #{record.rwPrice,jdbcType=DECIMAL},
+        yw = #{record.yw,jdbcType=INTEGER},
+        yw_price = #{record.ywPrice,jdbcType=DECIMAL},
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.steve.train.business.domain.DailyTrainTicket">
+        update daily_train_ticket
+        <set>
+            <if test="date != null">
+                `date` = #{date,jdbcType=DATE},
+            </if>
+            <if test="trainCode != null">
+                train_code = #{trainCode,jdbcType=VARCHAR},
+            </if>
+            <if test="start != null">
+                `start` = #{start,jdbcType=VARCHAR},
+            </if>
+            <if test="startPinyin != null">
+                start_pinyin = #{startPinyin,jdbcType=VARCHAR},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime,jdbcType=TIME},
+            </if>
+            <if test="startIndex != null">
+                start_index = #{startIndex,jdbcType=INTEGER},
+            </if>
+            <if test="end != null">
+                `end` = #{end,jdbcType=VARCHAR},
+            </if>
+            <if test="endPinyin != null">
+                end_pinyin = #{endPinyin,jdbcType=VARCHAR},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime,jdbcType=TIME},
+            </if>
+            <if test="endIndex != null">
+                end_index = #{endIndex,jdbcType=INTEGER},
+            </if>
+            <if test="ydz != null">
+                ydz = #{ydz,jdbcType=INTEGER},
+            </if>
+            <if test="ydzPrice != null">
+                ydz_price = #{ydzPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="edz != null">
+                edz = #{edz,jdbcType=INTEGER},
+            </if>
+            <if test="edzPrice != null">
+                edz_price = #{edzPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="rw != null">
+                rw = #{rw,jdbcType=INTEGER},
+            </if>
+            <if test="rwPrice != null">
+                rw_price = #{rwPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="yw != null">
+                yw = #{yw,jdbcType=INTEGER},
+            </if>
+            <if test="ywPrice != null">
+                yw_price = #{ywPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.steve.train.business.domain.DailyTrainTicket">
+        update daily_train_ticket
+        set `date`       = #{date,jdbcType=DATE},
+            train_code   = #{trainCode,jdbcType=VARCHAR},
+            `start`      = #{start,jdbcType=VARCHAR},
+            start_pinyin = #{startPinyin,jdbcType=VARCHAR},
+            start_time   = #{startTime,jdbcType=TIME},
+            start_index  = #{startIndex,jdbcType=INTEGER},
+            `end`        = #{end,jdbcType=VARCHAR},
+            end_pinyin   = #{endPinyin,jdbcType=VARCHAR},
+            end_time     = #{endTime,jdbcType=TIME},
+            end_index    = #{endIndex,jdbcType=INTEGER},
+            ydz          = #{ydz,jdbcType=INTEGER},
+            ydz_price    = #{ydzPrice,jdbcType=DECIMAL},
+            edz          = #{edz,jdbcType=INTEGER},
+            edz_price    = #{edzPrice,jdbcType=DECIMAL},
+            rw           = #{rw,jdbcType=INTEGER},
+            rw_price     = #{rwPrice,jdbcType=DECIMAL},
+            yw           = #{yw,jdbcType=INTEGER},
+            yw_price     = #{ywPrice,jdbcType=DECIMAL},
+            create_time  = #{createTime,jdbcType=TIMESTAMP},
+            update_time  = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>
