@@ -1,4 +1,4 @@
-package com.steve.train.business.controller;
+package com.steve.train.business.controller.admin;
 
 import com.steve.train.business.req.TrainCarriageQueryReq;
 import com.steve.train.business.req.TrainCarriageSaveReq;
