@@ -197,3 +197,24 @@ create table `daily_train_ticket`
     unique key `date_train_code_start_end_unique` (`date`, `train_code`, `start`, `end`)
 ) engine = innodb
   default charset = utf8mb4 comment ='余票信息';
+
+drop table if exists `confirm_order`;
+create table `confirm_order`
+(
+    `id`                    bigint      not null comment 'id',
+    `member_id`             bigint      not null comment '会员id',
+    `date`                  date        not null comment '日期',
+    `train_code`            varchar(20) not null comment '车次编号',
+    `start`                 varchar(20) not null comment '出发站',
+    `end`                   varchar(20) not null comment '到达站',
+    `daily_train_ticket_id` bigint      not null comment '余票ID',
+    # 由于一个订单可能包含多张车票，所以ticket也可以做成一张子表
+    `tickets`               json        not null comment '车票',
+    # comfirm_order中的订单可能失败。因为虽然在前端有余票校验，但是不可靠，尤其是在高峰抢票期间后端的余票消耗迅速，可能最终抢票失败。
+    `status`                char(1)     not null comment '订单状态|枚举[ConfirmOrderStatusEnum]',
+    `create_time`           datetime(3) comment '新增时间',
+    `update_time`           datetime(3) comment '修改时间',
+    primary key (`id`),
+    index `date_train_code_index` (`date`, `train_code`)
+) engine = innodb
+  default charset = utf8mb4 comment ='确认订单';

@@ -50,9 +50,15 @@
         <template #title>
           <span>
             <UnorderedListOutlined/>
-            业务信息
+            业务管理
           </span>
         </template>
+        <a-menu-item key="/business/confirmOrder">
+          <router-link to="/business/confirmOrder">
+            <MenuUnfoldOutlined/>
+            订单信息
+          </router-link>
+        </a-menu-item>
         <a-menu-item key="/business/dailyTrainTicket">
           <router-link to="/business/dailyTrainTicket">
             <MenuUnfoldOutlined/>
