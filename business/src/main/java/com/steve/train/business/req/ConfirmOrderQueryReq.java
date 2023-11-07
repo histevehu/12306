@@ -7,7 +7,7 @@ import com.steve.train.common.req.PageReq;
  * @date       : 2023-11-06 14:21:19
  * @description: confirmOrder查询请求封装类（FreeMarker生成）
  */
-public class confirmOrderQueryReq extends PageReq {
+public class ConfirmOrderQueryReq extends PageReq {
 
     @Override
     public String toString() {

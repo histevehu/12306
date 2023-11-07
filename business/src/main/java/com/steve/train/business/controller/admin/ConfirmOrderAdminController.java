@@ -1,9 +1,9 @@
 package com.steve.train.business.controller.admin;
 
-import com.steve.train.business.req.confirmOrderQueryReq;
-import com.steve.train.business.req.confirmOrderSaveReq;
-import com.steve.train.business.resp.confirmOrderQueryResp;
-import com.steve.train.business.service.confirmOrderService;
+import com.steve.train.business.req.ConfirmOrderDoReq;
+import com.steve.train.business.req.ConfirmOrderQueryReq;
+import com.steve.train.business.resp.ConfirmOrderQueryResp;
+import com.steve.train.business.service.ConfirmOrderService;
 import com.steve.train.common.resp.CommonResp;
 import com.steve.train.common.resp.PageResp;
 import jakarta.annotation.Resource;
@@ -17,20 +17,20 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/admin/confirmOrder")
-public class confirmOrderAdminController {
+public class ConfirmOrderAdminController {
 
     @Resource
-    private confirmOrderService confirmOrderService;
+    private ConfirmOrderService confirmOrderService;
 
     @PostMapping("/save")
-    public CommonResp<Object> save(@Valid @RequestBody confirmOrderSaveReq req) {
+    public CommonResp<Object> save(@Valid @RequestBody ConfirmOrderDoReq req) {
         confirmOrderService.save(req);
         return new CommonResp<>();
     }
 
     @GetMapping("/queryList")
-    public CommonResp<PageResp<confirmOrderQueryResp>> queryList(@Valid confirmOrderQueryReq req) {
-        PageResp<confirmOrderQueryResp> list = confirmOrderService.queryList(req);
+    public CommonResp<PageResp<ConfirmOrderQueryResp>> queryList(@Valid ConfirmOrderQueryReq req) {
+        PageResp<ConfirmOrderQueryResp> list = confirmOrderService.queryList(req);
         return new CommonResp<>(list);
     }
 

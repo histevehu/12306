@@ -1,70 +1,65 @@
-package com.steve.train.business.req;
+package com.steve.train.business.resp;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import java.util.Date;
 
 /*
  * @author     : Steve Hu
  * @date       : 2023-11-06 14:21:19
- * @description: confirmOrder保存（新增、修改）请求封装类（FreeMarker生成）
+ * @description: confirmOrder查询结果封装类（FreeMarker生成）
  */
-public class confirmOrderSaveReq {
+public class ConfirmOrderQueryResp {
 
     /**
      * id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     /**
      * 会员id
      */
-    @NotNull(message = "会员id不能为空")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long memberId;
 
     /**
      * 日期
      */
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    @NotNull(message = "日期不能为空")
     private Date date;
 
     /**
      * 车次编号
      */
-    @NotBlank(message = "车次编号不能为空")
     private String trainCode;
 
     /**
      * 出发站
      */
-    @NotBlank(message = "出发站不能为空")
     private String start;
 
     /**
      * 到达站
      */
-    @NotBlank(message = "到达站不能为空")
     private String end;
 
     /**
      * 余票ID
      */
-    @NotNull(message = "余票ID不能为空")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long dailyTrainTicketId;
 
     /**
      * 车票
      */
-    @NotBlank(message = "车票不能为空")
     private String tickets;
 
     /**
      * 订单状态|枚举[ConfirmOrderStatusEnum]
      */
-    @NotBlank(message = "订单状态不能为空")
     private String status;
 
     /**

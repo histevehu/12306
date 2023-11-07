@@ -5,7 +5,7 @@
         v-model:selectedKeys="selectedKeys"
         mode="inline"
         :style="{ height: '100%', borderRight: 0 }"
-        :open-keys="['base','business','batch']"
+        :open-keys="['base','business','batch','member']"
     >
       <a-sub-menu key="base">
         <template #title>
@@ -45,7 +45,20 @@
           </router-link>
         </a-menu-item>
       </a-sub-menu>
-
+      <a-sub-menu key="member">
+        <template #title>
+          <span>
+            <UnorderedListOutlined/>
+            会员管理
+          </span>
+        </template>
+        <a-menu-item key="/member/ticket">
+          <router-link to="/member/ticket">
+            <MenuUnfoldOutlined/>
+            会员车票
+          </router-link>
+        </a-menu-item>
+      </a-sub-menu>
       <a-sub-menu key="business">
         <template #title>
           <span>

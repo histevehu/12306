@@ -55,7 +55,13 @@ const routes = [{
                 component: () => import('../views/business/DailyTrainTicketView.vue')
             }, {
                 path: 'confirmOrder',
-                component: () => import('../views/business/confirmOrderView.vue')
+                component: () => import('../views/business/ConfirmOrderView.vue')
+            }]
+        }, {
+            path: 'member/',
+            children: [{
+                path: 'ticket',
+                component: () => import('../views/member/TicketView.vue')
             }]
         },
         {

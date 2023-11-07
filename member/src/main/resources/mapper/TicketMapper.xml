@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.steve.train.member.mapper.TicketMapper">
+  <resultMap id="BaseResultMap" type="com.steve.train.member.domain.Ticket">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="member_id" jdbcType="BIGINT" property="memberId" />
+    <result column="passenger_id" jdbcType="BIGINT" property="passengerId" />
+    <result column="passenger_name" jdbcType="VARCHAR" property="passengerName" />
+    <result column="train_date" jdbcType="DATE" property="trainDate" />
+    <result column="train_code" jdbcType="VARCHAR" property="trainCode" />
+    <result column="carriage_index" jdbcType="INTEGER" property="carriageIndex" />
+    <result column="seat_row" jdbcType="CHAR" property="seatRow" />
+    <result column="seat_col" jdbcType="CHAR" property="seatCol" />
+    <result column="start_station" jdbcType="VARCHAR" property="startStation" />
+    <result column="start_time" jdbcType="TIME" property="startTime" />
+    <result column="end_station" jdbcType="VARCHAR" property="endStation" />
+    <result column="end_time" jdbcType="TIME" property="endTime" />
+    <result column="seat_type" jdbcType="CHAR" property="seatType" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, member_id, passenger_id, passenger_name, train_date, train_code, carriage_index, 
+    seat_row, seat_col, start_station, start_time, end_station, end_time, seat_type, 
+    create_time, update_time
+  </sql>
+  <select id="selectByExample" parameterType="com.steve.train.member.domain.TicketExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from ticket
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ticket
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from ticket
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.steve.train.member.domain.TicketExample">
+    delete from ticket
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.steve.train.member.domain.Ticket">
+    insert into ticket (id, member_id, passenger_id, 
+      passenger_name, train_date, train_code, 
+      carriage_index, seat_row, seat_col, 
+      start_station, start_time, end_station, 
+      end_time, seat_type, create_time, 
+      update_time)
+    values (#{id,jdbcType=BIGINT}, #{memberId,jdbcType=BIGINT}, #{passengerId,jdbcType=BIGINT}, 
+      #{passengerName,jdbcType=VARCHAR}, #{trainDate,jdbcType=DATE}, #{trainCode,jdbcType=VARCHAR}, 
+      #{carriageIndex,jdbcType=INTEGER}, #{seatRow,jdbcType=CHAR}, #{seatCol,jdbcType=CHAR}, 
+      #{startStation,jdbcType=VARCHAR}, #{startTime,jdbcType=TIME}, #{endStation,jdbcType=VARCHAR}, 
+      #{endTime,jdbcType=TIME}, #{seatType,jdbcType=CHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.steve.train.member.domain.Ticket">
+    insert into ticket
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="memberId != null">
+        member_id,
+      </if>
+      <if test="passengerId != null">
+        passenger_id,
+      </if>
+      <if test="passengerName != null">
+        passenger_name,
+      </if>
+      <if test="trainDate != null">
+        train_date,
+      </if>
+      <if test="trainCode != null">
+        train_code,
+      </if>
+      <if test="carriageIndex != null">
+        carriage_index,
+      </if>
+      <if test="seatRow != null">
+        seat_row,
+      </if>
+      <if test="seatCol != null">
+        seat_col,
+      </if>
+      <if test="startStation != null">
+        start_station,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endStation != null">
+        end_station,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="seatType != null">
+        seat_type,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="memberId != null">
+        #{memberId,jdbcType=BIGINT},
+      </if>
+      <if test="passengerId != null">
+        #{passengerId,jdbcType=BIGINT},
+      </if>
+      <if test="passengerName != null">
+        #{passengerName,jdbcType=VARCHAR},
+      </if>
+      <if test="trainDate != null">
+        #{trainDate,jdbcType=DATE},
+      </if>
+      <if test="trainCode != null">
+        #{trainCode,jdbcType=VARCHAR},
+      </if>
+      <if test="carriageIndex != null">
+        #{carriageIndex,jdbcType=INTEGER},
+      </if>
+      <if test="seatRow != null">
+        #{seatRow,jdbcType=CHAR},
+      </if>
+      <if test="seatCol != null">
+        #{seatCol,jdbcType=CHAR},
+      </if>
+      <if test="startStation != null">
+        #{startStation,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIME},
+      </if>
+      <if test="endStation != null">
+        #{endStation,jdbcType=VARCHAR},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIME},
+      </if>
+      <if test="seatType != null">
+        #{seatType,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.steve.train.member.domain.TicketExample" resultType="java.lang.Long">
+    select count(*) from ticket
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update ticket
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.memberId != null">
+        member_id = #{record.memberId,jdbcType=BIGINT},
+      </if>
+      <if test="record.passengerId != null">
+        passenger_id = #{record.passengerId,jdbcType=BIGINT},
+      </if>
+      <if test="record.passengerName != null">
+        passenger_name = #{record.passengerName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.trainDate != null">
+        train_date = #{record.trainDate,jdbcType=DATE},
+      </if>
+      <if test="record.trainCode != null">
+        train_code = #{record.trainCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.carriageIndex != null">
+        carriage_index = #{record.carriageIndex,jdbcType=INTEGER},
+      </if>
+      <if test="record.seatRow != null">
+        seat_row = #{record.seatRow,jdbcType=CHAR},
+      </if>
+      <if test="record.seatCol != null">
+        seat_col = #{record.seatCol,jdbcType=CHAR},
+      </if>
+      <if test="record.startStation != null">
+        start_station = #{record.startStation,jdbcType=VARCHAR},
+      </if>
+      <if test="record.startTime != null">
+        start_time = #{record.startTime,jdbcType=TIME},
+      </if>
+      <if test="record.endStation != null">
+        end_station = #{record.endStation,jdbcType=VARCHAR},
+      </if>
+      <if test="record.endTime != null">
+        end_time = #{record.endTime,jdbcType=TIME},
+      </if>
+      <if test="record.seatType != null">
+        seat_type = #{record.seatType,jdbcType=CHAR},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update ticket
+    set id = #{record.id,jdbcType=BIGINT},
+      member_id = #{record.memberId,jdbcType=BIGINT},
+      passenger_id = #{record.passengerId,jdbcType=BIGINT},
+      passenger_name = #{record.passengerName,jdbcType=VARCHAR},
+      train_date = #{record.trainDate,jdbcType=DATE},
+      train_code = #{record.trainCode,jdbcType=VARCHAR},
+      carriage_index = #{record.carriageIndex,jdbcType=INTEGER},
+      seat_row = #{record.seatRow,jdbcType=CHAR},
+      seat_col = #{record.seatCol,jdbcType=CHAR},
+      start_station = #{record.startStation,jdbcType=VARCHAR},
+      start_time = #{record.startTime,jdbcType=TIME},
+      end_station = #{record.endStation,jdbcType=VARCHAR},
+      end_time = #{record.endTime,jdbcType=TIME},
+      seat_type = #{record.seatType,jdbcType=CHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.steve.train.member.domain.Ticket">
+    update ticket
+    <set>
+      <if test="memberId != null">
+        member_id = #{memberId,jdbcType=BIGINT},
+      </if>
+      <if test="passengerId != null">
+        passenger_id = #{passengerId,jdbcType=BIGINT},
+      </if>
+      <if test="passengerName != null">
+        passenger_name = #{passengerName,jdbcType=VARCHAR},
+      </if>
+      <if test="trainDate != null">
+        train_date = #{trainDate,jdbcType=DATE},
+      </if>
+      <if test="trainCode != null">
+        train_code = #{trainCode,jdbcType=VARCHAR},
+      </if>
+      <if test="carriageIndex != null">
+        carriage_index = #{carriageIndex,jdbcType=INTEGER},
+      </if>
+      <if test="seatRow != null">
+        seat_row = #{seatRow,jdbcType=CHAR},
+      </if>
+      <if test="seatCol != null">
+        seat_col = #{seatCol,jdbcType=CHAR},
+      </if>
+      <if test="startStation != null">
+        start_station = #{startStation,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIME},
+      </if>
+      <if test="endStation != null">
+        end_station = #{endStation,jdbcType=VARCHAR},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIME},
+      </if>
+      <if test="seatType != null">
+        seat_type = #{seatType,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.steve.train.member.domain.Ticket">
+    update ticket
+    set member_id = #{memberId,jdbcType=BIGINT},
+      passenger_id = #{passengerId,jdbcType=BIGINT},
+      passenger_name = #{passengerName,jdbcType=VARCHAR},
+      train_date = #{trainDate,jdbcType=DATE},
+      train_code = #{trainCode,jdbcType=VARCHAR},
+      carriage_index = #{carriageIndex,jdbcType=INTEGER},
+      seat_row = #{seatRow,jdbcType=CHAR},
+      seat_col = #{seatCol,jdbcType=CHAR},
+      start_station = #{startStation,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIME},
+      end_station = #{endStation,jdbcType=VARCHAR},
+      end_time = #{endTime,jdbcType=TIME},
+      seat_type = #{seatType,jdbcType=CHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

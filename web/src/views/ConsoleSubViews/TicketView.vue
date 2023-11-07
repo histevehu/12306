@@ -225,7 +225,7 @@ export default defineComponent({
         };
       }
 
-      // 保存查询参数
+      // 保存查询参数，这样刷新以后查询参数仍然保留
       SessionStorage.set(SESSION_TICKET_PARAMS, params.value);
 
       loading.value = true;
@@ -276,7 +276,7 @@ export default defineComponent({
     const stations = ref([]);
     const showStation = record => {
       visible.value = true;
-      axios.get("/business/daily-train-station/query-by-train-code", {
+      axios.get("/business/dailyTrainStation/queryByTrainCode", {
         params: {
           date: record.date,
           trainCode: record.trainCode
@@ -310,6 +310,7 @@ export default defineComponent({
     };
 
     onMounted(() => {
+      // 加载查询参数
       //  "|| {}"是常用技巧，可以避免空指针异常
       params.value = SessionStorage.get(SESSION_TICKET_PARAMS) || {};
       if (Tool.isNotEmpty(params.value)) {

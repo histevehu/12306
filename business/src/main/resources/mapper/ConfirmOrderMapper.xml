@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.steve.train.business.mapper.confirmOrderMapper">
-  <resultMap id="BaseResultMap" type="com.steve.train.business.domain.confirmOrder">
+<mapper namespace="com.steve.train.business.mapper.ConfirmOrderMapper">
+  <resultMap id="BaseResultMap" type="com.steve.train.business.domain.ConfirmOrder">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="member_id" jdbcType="BIGINT" property="memberId" />
     <result column="date" jdbcType="DATE" property="date" />
@@ -13,7 +13,7 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
-  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.steve.train.business.domain.confirmOrder">
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.steve.train.business.domain.ConfirmOrder">
     <result column="tickets" jdbcType="LONGVARCHAR" property="tickets" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -81,7 +81,7 @@
   <sql id="Blob_Column_List">
     tickets
   </sql>
-  <select id="selectByExampleWithBLOBs" parameterType="com.steve.train.business.domain.confirmOrderExample" resultMap="ResultMapWithBLOBs">
+  <select id="selectByExampleWithBLOBs" parameterType="com.steve.train.business.domain.ConfirmOrderExample" resultMap="ResultMapWithBLOBs">
     select
     <if test="distinct">
       distinct
@@ -97,7 +97,7 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByExample" parameterType="com.steve.train.business.domain.confirmOrderExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.steve.train.business.domain.ConfirmOrderExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -123,13 +123,13 @@
     delete from confirm_order
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <delete id="deleteByExample" parameterType="com.steve.train.business.domain.confirmOrderExample">
+  <delete id="deleteByExample" parameterType="com.steve.train.business.domain.ConfirmOrderExample">
     delete from confirm_order
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.steve.train.business.domain.confirmOrder">
+  <insert id="insert" parameterType="com.steve.train.business.domain.ConfirmOrder">
     insert into confirm_order (id, member_id, `date`, 
       train_code, `start`, `end`, 
       daily_train_ticket_id, `status`, create_time, 
@@ -139,7 +139,7 @@
       #{dailyTrainTicketId,jdbcType=BIGINT}, #{status,jdbcType=CHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{tickets,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.steve.train.business.domain.confirmOrder">
+  <insert id="insertSelective" parameterType="com.steve.train.business.domain.ConfirmOrder">
     insert into confirm_order
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -212,7 +212,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.steve.train.business.domain.confirmOrderExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.steve.train.business.domain.ConfirmOrderExample" resultType="java.lang.Long">
     select count(*) from confirm_order
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -292,7 +292,7 @@
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.steve.train.business.domain.confirmOrder">
+  <update id="updateByPrimaryKeySelective" parameterType="com.steve.train.business.domain.ConfirmOrder">
     update confirm_order
     <set>
       <if test="memberId != null">
@@ -328,7 +328,7 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.steve.train.business.domain.confirmOrder">
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.steve.train.business.domain.ConfirmOrder">
     update confirm_order
     set member_id = #{memberId,jdbcType=BIGINT},
       `date` = #{date,jdbcType=DATE},
@@ -342,7 +342,7 @@
       tickets = #{tickets,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.steve.train.business.domain.confirmOrder">
+  <update id="updateByPrimaryKey" parameterType="com.steve.train.business.domain.ConfirmOrder">
     update confirm_order
     set member_id = #{memberId,jdbcType=BIGINT},
       `date` = #{date,jdbcType=DATE},
