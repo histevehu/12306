@@ -72,6 +72,15 @@
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>1.4.6</version>
             </dependency>
+            <!--类似于Springboot，引入总的pom。后续的模块中需要使用alibaba cloud中的组件只要在子pom中引用组件名即可，不用指定版本-->
+                <dependency>
+                    <groupId>com.alibaba.cloud</groupId>
+                    <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                    <version>2022.0.0.0</version>
+                    <type>pom</type>
+                    <scope>import</scope>
+                </dependency>
+
         </dependencies>
     </dependencyManagement>
 
