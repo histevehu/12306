@@ -1,4 +1,4 @@
-GET http://localhost:8081/member/test-nacos
+GET http://localhost:8000/member/hello
 Accept: application/json
 
 ###

@@ -28,6 +28,7 @@ public class MemberLoginFilter implements GlobalFilter, Ordered {
         // 排除不需要拦截的请求
         // /admin开头的所有请求都不需要验证登录
         if (path.contains("/admin")
+                || path.contains("/member/hello")
                 || path.contains("/member/member/login")
                 || path.contains("/member/member/sendCode")) {
             LOG.info("请求：{}，不需要登录验证", path);
