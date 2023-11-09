@@ -5,7 +5,7 @@
           - 相关mapper中新增`<cache></cache>`
           - mapper中返回结果的实体类实现Serializable接口以序列化。-->
     <!--当对同个namespace的mapper做增删改操作时，MyBatis二级缓存就会清空（即使增删改的SQL没有改变数据，Mybatis都会将同个命名空间下的二级缓存清空）。-->
-    <cache></cache>
+    <!--<cache></cache>-->
     <resultMap id="BaseResultMap" type="com.steve.train.business.domain.Train">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="code" jdbcType="VARCHAR" property="code"/>

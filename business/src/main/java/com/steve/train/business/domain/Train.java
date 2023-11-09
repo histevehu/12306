@@ -1,13 +1,13 @@
 package com.steve.train.business.domain;
 
-import java.io.Serializable;
 import java.util.Date;
 
 // MyBatis的二级缓存默认关闭。若要开启，需要：
 // - 相关mapper中新增`<cache></cache>`
 // - mapper中返回结果的实体类实现Serializable接口以序列化。
 //   当一个类需要保存起来，下次再还原成类时就需要序列化，或者需要远程传输，比如放到redis里，也需要序列化
-public class Train implements Serializable {
+// public class Train implements Serializable {
+public class Train {
     private Long id;
 
     private String code;

@@ -75,6 +75,7 @@ public class DailyTrainTicketQueryReq extends PageReq {
     }
 
     @Override
+    // 若只有本类的属性，没有包含父类的page,size属性，会导致page参数发生变化时，生成的key跟之前的一样而直接读取上一页的缓存内容而发生错误
     public int hashCode() {
         return Objects.hash(date, trainCode, start, end, getPage(), getSize());
     }
