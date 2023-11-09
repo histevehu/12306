@@ -1,0 +1,7 @@
+
+GET http://localhost:8000/business/admin/station/queryList?page=1&size=5
+Accept: application/json
+
+###
+GET http://localhost:8000/business/hello
+Accept: application/json

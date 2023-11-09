@@ -1,3 +1,2 @@
-
-GET http://localhost:8000/business/admin/station/queryList?page=1&size=5
+GET http://localhost:8000/batch/hello
 Accept: application/json
