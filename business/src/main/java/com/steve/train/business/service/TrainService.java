@@ -92,6 +92,7 @@ public class TrainService {
     }
 
     public List<TrainQueryResp> queryAll() {
+        // 查询所有车次接口和查询所有车站接囗是典型的读多写少的接口，很适合用来做缓存
         TrainExample trainExample = new TrainExample();
         // 将所有的车次信息按照车次代码升序排列
         trainExample.setOrderByClause("code asc");

@@ -1,306 +1,315 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.steve.train.business.mapper.TrainMapper">
-  <resultMap id="BaseResultMap" type="com.steve.train.business.domain.Train">
-    <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="code" jdbcType="VARCHAR" property="code" />
-    <result column="type" jdbcType="CHAR" property="type" />
-    <result column="start" jdbcType="VARCHAR" property="start" />
-    <result column="start_pinyin" jdbcType="VARCHAR" property="startPinyin" />
-    <result column="start_time" jdbcType="TIME" property="startTime" />
-    <result column="end" jdbcType="VARCHAR" property="end" />
-    <result column="end_pinyin" jdbcType="VARCHAR" property="endPinyin" />
-    <result column="end_time" jdbcType="TIME" property="endTime" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-  </resultMap>
-  <sql id="Example_Where_Clause">
-    <where>
-      <foreach collection="oredCriteria" item="criteria" separator="or">
-        <if test="criteria.valid">
-          <trim prefix="(" prefixOverrides="and" suffix=")">
-            <foreach collection="criteria.criteria" item="criterion">
-              <choose>
-                <when test="criterion.noValue">
-                  and ${criterion.condition}
-                </when>
-                <when test="criterion.singleValue">
-                  and ${criterion.condition} #{criterion.value}
-                </when>
-                <when test="criterion.betweenValue">
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                </when>
-                <when test="criterion.listValue">
-                  and ${criterion.condition}
-                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
-                    #{listItem}
-                  </foreach>
-                </when>
-              </choose>
+    <!--MyBatis的二级缓存默认关闭。若要开启，需要：
+          - 相关mapper中新增`<cache></cache>`
+          - mapper中返回结果的实体类实现Serializable接口以序列化。-->
+    <!--当对同个namespace的mapper做增删改操作时，MyBatis二级缓存就会清空（即使增删改的SQL没有改变数据，Mybatis都会将同个命名空间下的二级缓存清空）。-->
+    <cache></cache>
+    <resultMap id="BaseResultMap" type="com.steve.train.business.domain.Train">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="type" jdbcType="CHAR" property="type"/>
+        <result column="start" jdbcType="VARCHAR" property="start"/>
+        <result column="start_pinyin" jdbcType="VARCHAR" property="startPinyin"/>
+        <result column="start_time" jdbcType="TIME" property="startTime"/>
+        <result column="end" jdbcType="VARCHAR" property="end"/>
+        <result column="end_pinyin" jdbcType="VARCHAR" property="endPinyin"/>
+        <result column="end_time" jdbcType="TIME" property="endTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
             </foreach>
-          </trim>
-        </if>
-      </foreach>
-    </where>
-  </sql>
-  <sql id="Update_By_Example_Where_Clause">
-    <where>
-      <foreach collection="example.oredCriteria" item="criteria" separator="or">
-        <if test="criteria.valid">
-          <trim prefix="(" prefixOverrides="and" suffix=")">
-            <foreach collection="criteria.criteria" item="criterion">
-              <choose>
-                <when test="criterion.noValue">
-                  and ${criterion.condition}
-                </when>
-                <when test="criterion.singleValue">
-                  and ${criterion.condition} #{criterion.value}
-                </when>
-                <when test="criterion.betweenValue">
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                </when>
-                <when test="criterion.listValue">
-                  and ${criterion.condition}
-                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
-                    #{listItem}
-                  </foreach>
-                </when>
-              </choose>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
             </foreach>
-          </trim>
-        </if>
-      </foreach>
-    </where>
-  </sql>
-  <sql id="Base_Column_List">
-    id, code, `type`, `start`, start_pinyin, start_time, `end`, end_pinyin, end_time, 
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, code, `type`, `start`, start_pinyin, start_time, `end`, end_pinyin, end_time,
     create_time, update_time
-  </sql>
-  <select id="selectByExample" parameterType="com.steve.train.business.domain.TrainExample" resultMap="BaseResultMap">
-    select
-    <if test="distinct">
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from train
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
-  </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select 
-    <include refid="Base_Column_List" />
-    from train
-    where id = #{id,jdbcType=BIGINT}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from train
-    where id = #{id,jdbcType=BIGINT}
-  </delete>
-  <delete id="deleteByExample" parameterType="com.steve.train.business.domain.TrainExample">
-    delete from train
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </delete>
-  <insert id="insert" parameterType="com.steve.train.business.domain.Train">
-    insert into train (id, code, `type`, `start`, 
-      start_pinyin, start_time, `end`, 
-      end_pinyin, end_time, create_time, 
-      update_time)
-    values (#{id,jdbcType=BIGINT}, #{code,jdbcType=VARCHAR}, #{type,jdbcType=CHAR}, #{start,jdbcType=VARCHAR}, 
-      #{startPinyin,jdbcType=VARCHAR}, #{startTime,jdbcType=TIME}, #{end,jdbcType=VARCHAR}, 
-      #{endPinyin,jdbcType=VARCHAR}, #{endTime,jdbcType=TIME}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP})
-  </insert>
-  <insert id="insertSelective" parameterType="com.steve.train.business.domain.Train">
-    insert into train
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
-      <if test="code != null">
-        code,
-      </if>
-      <if test="type != null">
-        `type`,
-      </if>
-      <if test="start != null">
-        `start`,
-      </if>
-      <if test="startPinyin != null">
-        start_pinyin,
-      </if>
-      <if test="startTime != null">
-        start_time,
-      </if>
-      <if test="end != null">
-        `end`,
-      </if>
-      <if test="endPinyin != null">
-        end_pinyin,
-      </if>
-      <if test="endTime != null">
-        end_time,
-      </if>
-      <if test="createTime != null">
-        create_time,
-      </if>
-      <if test="updateTime != null">
-        update_time,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=BIGINT},
-      </if>
-      <if test="code != null">
-        #{code,jdbcType=VARCHAR},
-      </if>
-      <if test="type != null">
-        #{type,jdbcType=CHAR},
-      </if>
-      <if test="start != null">
-        #{start,jdbcType=VARCHAR},
-      </if>
-      <if test="startPinyin != null">
-        #{startPinyin,jdbcType=VARCHAR},
-      </if>
-      <if test="startTime != null">
-        #{startTime,jdbcType=TIME},
-      </if>
-      <if test="end != null">
-        #{end,jdbcType=VARCHAR},
-      </if>
-      <if test="endPinyin != null">
-        #{endPinyin,jdbcType=VARCHAR},
-      </if>
-      <if test="endTime != null">
-        #{endTime,jdbcType=TIME},
-      </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null">
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-    </trim>
-  </insert>
-  <select id="countByExample" parameterType="com.steve.train.business.domain.TrainExample" resultType="java.lang.Long">
-    select count(*) from train
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </select>
-  <update id="updateByExampleSelective" parameterType="map">
-    update train
-    <set>
-      <if test="record.id != null">
-        id = #{record.id,jdbcType=BIGINT},
-      </if>
-      <if test="record.code != null">
+    </sql>
+    <select id="selectByExample" parameterType="com.steve.train.business.domain.TrainExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from train
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from train
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from train
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.steve.train.business.domain.TrainExample">
+        delete from train
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.steve.train.business.domain.Train">
+        insert into train (id, code, `type`, `start`,
+                           start_pinyin, start_time, `end`,
+                           end_pinyin, end_time, create_time,
+                           update_time)
+        values (#{id,jdbcType=BIGINT}, #{code,jdbcType=VARCHAR}, #{type,jdbcType=CHAR}, #{start,jdbcType=VARCHAR},
+                #{startPinyin,jdbcType=VARCHAR}, #{startTime,jdbcType=TIME}, #{end,jdbcType=VARCHAR},
+                #{endPinyin,jdbcType=VARCHAR}, #{endTime,jdbcType=TIME}, #{createTime,jdbcType=TIMESTAMP},
+                #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.steve.train.business.domain.Train">
+        insert into train
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="type != null">
+                `type`,
+            </if>
+            <if test="start != null">
+                `start`,
+            </if>
+            <if test="startPinyin != null">
+                start_pinyin,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="end != null">
+                `end`,
+            </if>
+            <if test="endPinyin != null">
+                end_pinyin,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=CHAR},
+            </if>
+            <if test="start != null">
+                #{start,jdbcType=VARCHAR},
+            </if>
+            <if test="startPinyin != null">
+                #{startPinyin,jdbcType=VARCHAR},
+            </if>
+            <if test="startTime != null">
+                #{startTime,jdbcType=TIME},
+            </if>
+            <if test="end != null">
+                #{end,jdbcType=VARCHAR},
+            </if>
+            <if test="endPinyin != null">
+                #{endPinyin,jdbcType=VARCHAR},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=TIME},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.steve.train.business.domain.TrainExample"
+            resultType="java.lang.Long">
+        select count(*) from train
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update train
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.code != null">
+                code = #{record.code,jdbcType=VARCHAR},
+            </if>
+            <if test="record.type != null">
+                `type` = #{record.type,jdbcType=CHAR},
+            </if>
+            <if test="record.start != null">
+                `start` = #{record.start,jdbcType=VARCHAR},
+            </if>
+            <if test="record.startPinyin != null">
+                start_pinyin = #{record.startPinyin,jdbcType=VARCHAR},
+            </if>
+            <if test="record.startTime != null">
+                start_time = #{record.startTime,jdbcType=TIME},
+            </if>
+            <if test="record.end != null">
+                `end` = #{record.end,jdbcType=VARCHAR},
+            </if>
+            <if test="record.endPinyin != null">
+                end_pinyin = #{record.endPinyin,jdbcType=VARCHAR},
+            </if>
+            <if test="record.endTime != null">
+                end_time = #{record.endTime,jdbcType=TIME},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.updateTime != null">
+                update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update train
+        set id = #{record.id,jdbcType=BIGINT},
         code = #{record.code,jdbcType=VARCHAR},
-      </if>
-      <if test="record.type != null">
         `type` = #{record.type,jdbcType=CHAR},
-      </if>
-      <if test="record.start != null">
         `start` = #{record.start,jdbcType=VARCHAR},
-      </if>
-      <if test="record.startPinyin != null">
         start_pinyin = #{record.startPinyin,jdbcType=VARCHAR},
-      </if>
-      <if test="record.startTime != null">
         start_time = #{record.startTime,jdbcType=TIME},
-      </if>
-      <if test="record.end != null">
         `end` = #{record.end,jdbcType=VARCHAR},
-      </if>
-      <if test="record.endPinyin != null">
         end_pinyin = #{record.endPinyin,jdbcType=VARCHAR},
-      </if>
-      <if test="record.endTime != null">
         end_time = #{record.endTime,jdbcType=TIME},
-      </if>
-      <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.updateTime != null">
-        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      </if>
-    </set>
-    <if test="_parameter != null">
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
-  <update id="updateByExample" parameterType="map">
-    update train
-    set id = #{record.id,jdbcType=BIGINT},
-      code = #{record.code,jdbcType=VARCHAR},
-      `type` = #{record.type,jdbcType=CHAR},
-      `start` = #{record.start,jdbcType=VARCHAR},
-      start_pinyin = #{record.startPinyin,jdbcType=VARCHAR},
-      start_time = #{record.startTime,jdbcType=TIME},
-      `end` = #{record.end,jdbcType=VARCHAR},
-      end_pinyin = #{record.endPinyin,jdbcType=VARCHAR},
-      end_time = #{record.endTime,jdbcType=TIME},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
-    <if test="_parameter != null">
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.steve.train.business.domain.Train">
-    update train
-    <set>
-      <if test="code != null">
-        code = #{code,jdbcType=VARCHAR},
-      </if>
-      <if test="type != null">
-        `type` = #{type,jdbcType=CHAR},
-      </if>
-      <if test="start != null">
-        `start` = #{start,jdbcType=VARCHAR},
-      </if>
-      <if test="startPinyin != null">
-        start_pinyin = #{startPinyin,jdbcType=VARCHAR},
-      </if>
-      <if test="startTime != null">
-        start_time = #{startTime,jdbcType=TIME},
-      </if>
-      <if test="end != null">
-        `end` = #{end,jdbcType=VARCHAR},
-      </if>
-      <if test="endPinyin != null">
-        end_pinyin = #{endPinyin,jdbcType=VARCHAR},
-      </if>
-      <if test="endTime != null">
-        end_time = #{endTime,jdbcType=TIME},
-      </if>
-      <if test="createTime != null">
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-    </set>
-    where id = #{id,jdbcType=BIGINT}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.steve.train.business.domain.Train">
-    update train
-    set code = #{code,jdbcType=VARCHAR},
-      `type` = #{type,jdbcType=CHAR},
-      `start` = #{start,jdbcType=VARCHAR},
-      start_pinyin = #{startPinyin,jdbcType=VARCHAR},
-      start_time = #{startTime,jdbcType=TIME},
-      `end` = #{end,jdbcType=VARCHAR},
-      end_pinyin = #{endPinyin,jdbcType=VARCHAR},
-      end_time = #{endTime,jdbcType=TIME},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=BIGINT}
-  </update>
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.steve.train.business.domain.Train">
+        update train
+        <set>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                `type` = #{type,jdbcType=CHAR},
+            </if>
+            <if test="start != null">
+                `start` = #{start,jdbcType=VARCHAR},
+            </if>
+            <if test="startPinyin != null">
+                start_pinyin = #{startPinyin,jdbcType=VARCHAR},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime,jdbcType=TIME},
+            </if>
+            <if test="end != null">
+                `end` = #{end,jdbcType=VARCHAR},
+            </if>
+            <if test="endPinyin != null">
+                end_pinyin = #{endPinyin,jdbcType=VARCHAR},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime,jdbcType=TIME},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.steve.train.business.domain.Train">
+        update train
+        set code         = #{code,jdbcType=VARCHAR},
+            `type`       = #{type,jdbcType=CHAR},
+            `start`      = #{start,jdbcType=VARCHAR},
+            start_pinyin = #{startPinyin,jdbcType=VARCHAR},
+            start_time   = #{startTime,jdbcType=TIME},
+            `end`        = #{end,jdbcType=VARCHAR},
+            end_pinyin   = #{endPinyin,jdbcType=VARCHAR},
+            end_time     = #{endTime,jdbcType=TIME},
+            create_time  = #{createTime,jdbcType=TIMESTAMP},
+            update_time  = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
 </mapper>
