@@ -31,6 +31,7 @@ public class MemberLoginFilter implements GlobalFilter, Ordered {
                 || path.contains("/batch/hello")
                 || path.contains("/business/hello")
                 || path.contains("/member/hello")
+                || path.contains("/redis")
                 || path.contains("/member/member/login")
                 || path.contains("/member/member/sendCode")) {
             LOG.info("请求：{}，不需要登录验证", path);

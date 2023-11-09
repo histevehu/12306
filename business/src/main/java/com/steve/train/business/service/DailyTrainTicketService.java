@@ -25,7 +25,6 @@ import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +69,7 @@ public class DailyTrainTicketService {
     // Spring内置缓存，无过期时间
     // @cacheable开辟一块空间，根据不同的请求参数，空间内会缓存多个结果。会根据请求参数生成一个 key，需要对请求参数生成hashCode和equals方法，用于生成key
     // value值为缓存名
-    @Cacheable(value = "DailyTrainTicketService.queryList")
+    // @Cacheable(value = "DailyTrainTicketService.queryList")
     public PageResp<DailyTrainTicketQueryResp> queryList(DailyTrainTicketQueryReq req) {
         DailyTrainTicketExample dailyTrainTicketExample = new DailyTrainTicketExample();
         dailyTrainTicketExample.setOrderByClause("id asc");
