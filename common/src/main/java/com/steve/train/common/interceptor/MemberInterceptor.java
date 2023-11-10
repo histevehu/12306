@@ -38,7 +38,8 @@ public class MemberInterceptor implements HandlerInterceptor {
             LOG.info("当前登录会员：{}", loginMember);
             // 根据token还原后的字段生成登录信息类
             MemberLoginResp member = JSONUtil.toBean(loginMember, MemberLoginResp.class);
-            // 只要当前线程完成上述过程，即将登录信息保存在该线程的本地变量中
+            // 只要当前线程完成上述过程，即将登录信息保存在该线程的本地变量中，线程本地变量只在当前线程（一次请求）有效
+            // 后续接口中所有调用用户信息的接口都直接从线程本地变量中获取
             MemberLoginContext.setMember(member);
         }
         LOG.info("### MemberInterceptor结束 ###");
