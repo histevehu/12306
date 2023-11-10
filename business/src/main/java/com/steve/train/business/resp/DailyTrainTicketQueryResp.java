@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -12,7 +13,8 @@ import java.util.Date;
  * @date       : 2023-11-02 15:01:09
  * @description: DailyTrainTicket查询结果封装类（FreeMarker生成）
  */
-public class DailyTrainTicketQueryResp {
+// 因为需要将查询结果放进Redis缓存，所以需要实现Serializable序列化接口
+public class DailyTrainTicketQueryResp implements Serializable {
 
     /**
      * id
