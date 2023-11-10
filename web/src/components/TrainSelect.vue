@@ -46,14 +46,24 @@ export default defineComponent({
      * 查询所有的车次，用于车次下拉框
      */
     const queryAllTrain = () => {
-      axios.get("/business/train/queryAll").then((response) => {
-        let data = response.data;
-        if (data.success) {
-          trains.value = data.content;
-        } else {
-          notification.error({description: data.message});
-        }
-      });
+      // 引入前段缓存，使一些数据相对固定的界面（比如车站车次查询）每次加载后读取本地缓存而不必发起查询请求
+      let list = SessionStorage.get(SESSION_ALL_TRAIN);
+      // 若缓存中有数据，使用缓存数据
+      if (Tool.isNotEmpty(list)) {
+        console.log("queryAllTrain 读取缓存");
+        trains.value = list;
+      } else {
+        axios.get("/business/train/queryAll").then((response) => {
+          let data = response.data;
+          if (data.success) {
+            trains.value = data.content;
+            console.log("queryAllTrain 保存缓存");
+            SessionStorage.set(SESSION_ALL_TRAIN, trains.value);
+          } else {
+            notification.error({description: data.message});
+          }
+        });
+      }
     };
 
     /**
