@@ -26,6 +26,7 @@ create table `passenger`
 
 # 购票成功记录表
 drop table if exists `ticket`;
+# 使用关键字作为字段名，会寻致Seata保存undo_log报错，Seata生成的SQL不会自动为关键字加上反引号``
 create table `ticket`
 (
     `id`             bigint      not null comment 'id',
@@ -48,3 +49,21 @@ create table `ticket`
     index `member_id_index` (`member_id`)
 ) engine = innodb
   default charset = utf8mb4 comment ='车票';
+
+# Seata的AT模式需要在数据库中添加这张固定的表
+CREATE TABLE `undo_log`
+(
+    `id`            bigint(20)   NOT NULL AUTO_INCREMENT,
+    `branch_id`     bigint(20)   NOT NULL,
+    `xid`           varchar(100) NOT NULL,
+    `context`       varchar(128) NOT NULL,
+    `rollback_info` longblob     NOT NULL,
+    `log_status`    int(11)      NOT NULL,
+    `log_created`   datetime     NOT NULL,
+    `log_modified`  datetime     NOT NULL,
+    `ext`           varchar(100) DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `ux_undo_log` (`xid`, `branch_id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8;

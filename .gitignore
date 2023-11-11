@@ -30,3 +30,4 @@ out/
 log/
 .idea/
 nacos-server-2.2.1/
+seata-server-1.7.1/

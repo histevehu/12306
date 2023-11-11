@@ -11,6 +11,8 @@ import com.steve.train.business.mapper.custom.DailyTrainTicketMapperCustom;
 import com.steve.train.business.req.ConfirmOrderTicketReq;
 import com.steve.train.common.req.MemberTicketReq;
 import com.steve.train.common.resp.CommonResp;
+import io.seata.core.context.RootContext;
+import io.seata.spring.annotation.GlobalTransactional;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,15 +40,16 @@ public class AfterConfirmOrderService {
 
     /**
      * 选中座位后事务处理：
-     * 座位表修改售卖情况sell；
-     * 余票详情表修改余票；
-     * 为会员增加购票记录
-     * 更新确认订单为成功
+     * -座位表修改售卖情况sell
+     * -余票详情表修改余票
+     * -为会员增加购票记录
+     * -更新确认订单为成功
      */
     // @Transactional
-    // @GlobalTransactional
+    // Seata事务注解
+    @GlobalTransactional
     public void afterDoConfirm(DailyTrainTicket dailyTrainTicket, List<DailyTrainSeat> finalSeatList, List<ConfirmOrderTicketReq> tickets, ConfirmOrder confirmOrder) throws Exception {
-        // LOG.info("seata全局事务ID: {}", RootContext.getXID());
+        LOG.info("seata全局事务ID: {}", RootContext.getXID());
         for (int j = 0; j < finalSeatList.size(); j++) {
             DailyTrainSeat dailyTrainSeat = finalSeatList.get(j);
             DailyTrainSeat seatForUpdate = new DailyTrainSeat();
@@ -96,16 +99,9 @@ public class AfterConfirmOrderService {
             }
             LOG.info("影响到达站区间：" + minEndIndex + "-" + maxEndIndex);
             // 更新所有受影响的余票数量
-            dailyTrainTicketMapperCustom.updateCountBySell(
-                    dailyTrainSeat.getDate(),
-                    dailyTrainSeat.getTrainCode(),
-                    dailyTrainSeat.getSeatType(),
-                    minStartIndex,
-                    maxStartIndex,
-                    minEndIndex,
-                    maxEndIndex);
+            dailyTrainTicketMapperCustom.updateCountBySell(dailyTrainSeat.getDate(), dailyTrainSeat.getTrainCode(), dailyTrainSeat.getSeatType(), minStartIndex, maxStartIndex, minEndIndex, maxEndIndex);
 
-            //     // 调用会员服务接口，为会员增加一张车票
+            // 调用会员服务接口，为会员增加一张车票
             MemberTicketReq memberTicketReq = new MemberTicketReq();
             memberTicketReq.setMemberId(confirmOrder.getMemberId());
             memberTicketReq.setPassengerId(tickets.get(j).getPassengerId());
