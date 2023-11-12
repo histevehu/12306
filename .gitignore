@@ -30,4 +30,5 @@ out/
 log/
 .idea/
 nacos-server-2.2.1/
-seata-server-1.7.1/
+seata-server-1.6.1/
+jmeter-5.6.2/

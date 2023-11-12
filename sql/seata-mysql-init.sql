@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS `branch_table`
   DEFAULT CHARSET = utf8mb4 comment ='分支事务';
 
 -- the table to store lock data
+-- AT模式会有个全局锁，用于防止脏读，线程1的事务修改了库存，但还没提交事务，线程2读库存时，读的还是原来的库存
 CREATE TABLE IF NOT EXISTS `lock_table`
 (
     `row_key`        VARCHAR(128) NOT NULL,

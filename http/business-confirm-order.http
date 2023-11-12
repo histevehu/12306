@@ -1,0 +1,29 @@
+POST http://localhost:8000/business/confirmOrder/do
+Content-Type: application/json
+token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE2OTk4MDE1MTMsIm1vYmlsZSI6IjE4MDAwMDAwMDAwIiwiaWQiOjE3MTcxMzQ5MzY3MDU3MzI2MDgsImV4cCI6MTY5OTg4NzkxMywiaWF0IjoxNjk5ODAxNTEzfQ.JgznLVh4lsjyKvke9PKT8lRd1S-ubsMu5LZlYBEHWlA
+
+{
+  "dailyTrainTicketId": "1723709225391230976",
+  "date": "2023-11-13",
+  "trainCode": "G590",
+  "start": "绍兴北",
+  "end": "南京南",
+  "tickets": [
+    {
+      "passengerId": "1721165922787528704",
+      "passengerType": "1",
+      "seatTypeCode": "1",
+      "passengerName": "胡子为",
+      "passengerIdCard": "330123",
+      "seat": null
+    }
+  ],
+  "imageCodeToken": "JjW2FIC7",
+  "imageCode": "2",
+  "lineNumber": 5
+}
+###
+
+GET http://localhost:8000/business/confirm-order/query-line-count/1662452972099080192
+Content-Type: application/json
+token: {{token}}
