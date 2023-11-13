@@ -59,6 +59,7 @@ public class ConfirmOrderService {
     private DailyTrainSeatService dailyTrainSeatService;
     @Resource
     private AfterConfirmOrderService afterConfirmOrderService;
+
     /**
      * 注意：@AutoWired按byType自动注入，⽽@Resource默认按byName自动注入，即直接根据bean的ID进⾏注⼊。<br><br>
      * 使用JDK的@Resource:会根据变量名去查找原始类。比如，在 {@link RedisController}中我们声明了变量{@link RedisController#redisTemplate}，JDK会根据变量名查找{@link RedisTemplate}类并注入。而在这里如果我们将{@link StringRedisTemplate}类型的变量命名为{@link ConfirmOrderService#redisTemplate}则JDK会找到{@link RedisTemplate}类，这与声明的{@link StringRedisTemplate}不符，则会报错：Bean named 'redisTemplate' is expected to be of type 'org.springframework.data.redis.core.StringRedisTemplate' but was actually of type 'org.springframework.data.redis.core.RedisTemplate'。<br><br>
@@ -67,6 +68,9 @@ public class ConfirmOrderService {
     // @Resource
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    /*@Autowired
+    private RedissonClient redissonClient;*/
 
 
     public void save(ConfirmOrderDoReq req) {
@@ -115,7 +119,9 @@ public class ConfirmOrderService {
         // 为该日期该车次获得Redis分布式锁
         String dlKey = req.getDate() + "-" + req.getTrainCode();
         // 问题：线程执行时间超过锁时间，会导致锁失效，从而出现超卖
-        // 解决方案：引入看门狗（守护线程）：定时查询锁剩余时间，当小于一定值时自动延时。使用守护线程的好处是会随主线程的结束而结束，所以不会出现一直重置而永不过期的问题
+        // 解决方案：引入看门狗（守护线程）（项目主流使用此方案）：定时查询锁剩余时间，当小于一定值时自动延时。使用守护线程的好处是会随主线程的结束而结束，所以不会出现一直重置而永不过期的问题
+        // 问题：Redis集群宕机，不同的请求在新老结点中都获取到了锁
+        //  解决方案：Redis红锁，一个分布式锁由多个节点共同维护，每个节点通过竞争获得锁。算法要求至少半数以上的节点成功获取锁才算锁获取成功。由于开销大，项目一般很少使用。
        /* Boolean redisDL = redisTemplate.opsForValue().setIfAbsent(dlKey, dlKey, 60, TimeUnit.SECONDS);
         if (Boolean.TRUE.equals(redisDL)) {
             LOG.info("获得分布式锁，lockKey：{}", dlKey);
@@ -127,13 +133,16 @@ public class ConfirmOrderService {
         }*/
         RLock lock = null;
         try {
-            /*不使用看门狗
-            waitTime 等待获取锁时间（最大尝试获得锁的时间），超时返回false
-            leaseTime 锁时长，即n秒后自动释放锁
-            time unit 时间单位*/
-            // boolean tryLock = lock.tryLock(0, 10, TimeUnit.SECONDS);
-            // 使用看门狗
+            // 使用看门狗守护进程方案
             boolean tryLock = lock.tryLock(0, TimeUnit.SECONDS);
+            // 使用Redis红锁方案。假设有3个节点，则至少要获得⌊3/2⌋+1=2个节点的锁
+            /*RLock lock1 = redissonClient1.getLock(dlKey);
+            RLock lock2 = redissonClient2.getLock(dlKey);
+            RLock lock3 = redissonClient3.getLock(dlKey);
+            RedissonRedLock redissonRedLock=new RedissonRedLock(lock1,lock2,lock3);
+            boolean tryRedLock=redissonRedLock.tryLock(0, TimeUnit.SECONDS);
+            ...后续代码同看门狗方案
+            */
             if (tryLock) {
                 LOG.info("获得分布式锁，lockKey：{}", dlKey);
             } else {
