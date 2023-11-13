@@ -73,14 +73,21 @@
                 <version>1.4.6</version>
             </dependency>
             <!--类似于Springboot，引入总的pom。后续的模块中需要使用alibaba cloud中的组件只要在子pom中引用组件名即可，不用指定版本-->
-                <dependency>
-                    <groupId>com.alibaba.cloud</groupId>
-                    <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                    <version>2022.0.0.0</version>
-                    <type>pom</type>
-                    <scope>import</scope>
-                </dependency>
-
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>2022.0.0.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--Redisson-->
+            <!--至少3.18.0版本，才支持spring boot 3-->
+            <!--升级到3.20.0，否则打包生产会报错：Could not initialize class org.redisson.spring.data.connection.RedissonConnection-->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>3.21.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
