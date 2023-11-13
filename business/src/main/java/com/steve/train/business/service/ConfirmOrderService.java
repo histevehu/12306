@@ -10,6 +10,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.steve.train.business.controller.RedisController;
 import com.steve.train.business.domain.*;
 import com.steve.train.business.enums.ConfirmOrderStatusEnum;
 import com.steve.train.business.enums.SeatTypeEnum;
@@ -27,11 +28,15 @@ import com.steve.train.common.util.SnowFlakeUtil;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /*
  * @author     : Steve Hu
@@ -53,6 +58,14 @@ public class ConfirmOrderService {
     private DailyTrainSeatService dailyTrainSeatService;
     @Resource
     private AfterConfirmOrderService afterConfirmOrderService;
+    /**
+     * 注意：@AutoWired按byType自动注入，⽽@Resource默认按byName自动注入，即直接根据bean的ID进⾏注⼊。<br><br>
+     * 使用JDK的@Resource:会根据变量名去查找原始类。比如，在 {@link RedisController}中我们声明了变量{@link RedisController#redisTemplate}，JDK会根据变量名查找{@link RedisTemplate}类并注入。而在这里如果我们将{@link StringRedisTemplate}类型的变量命名为{@link ConfirmOrderService#redisTemplate}则JDK会找到{@link RedisTemplate}类，这与声明的{@link StringRedisTemplate}不符，则会报错：Bean named 'redisTemplate' is expected to be of type 'org.springframework.data.redis.core.StringRedisTemplate' but was actually of type 'org.springframework.data.redis.core.RedisTemplate'。<br><br>
+     * 使用Spring的@AutoWired:会根据变量类型去常量池找该类型的变量。
+     */
+    // @Resource
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
 
     public void save(ConfirmOrderDoReq req) {
@@ -98,6 +111,17 @@ public class ConfirmOrderService {
     public void doConfirm(ConfirmOrderDoReq req) {
         // TODO:省略业务数据校验，如：车次是否存在、余票是否存在、车次是否在有效期内、tickets条数>0
         // TODO:省略同乘客同车次是否已经买过
+        // 为该日期该车次获得Redis分布式锁
+        String dlKey = req.getDate() + "-" + req.getTrainCode();
+        Boolean redisDL = redisTemplate.opsForValue().setIfAbsent(dlKey, dlKey, 10, TimeUnit.SECONDS);
+        if (Boolean.TRUE.equals(redisDL)) {
+            LOG.info("获得分布式锁，lockKey：{}", dlKey);
+        } else {
+            // 只是没抢到锁，并不知道票抢完了没，所以提示稍候再试
+            // LOG.info("很遗憾，没抢到锁！lockKey：{}", lockKey);
+            LOG.warn("获得分布式锁失败，lockKey：{}", dlKey);
+            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_LOCK_FAIL);
+        }
         // 订单入库，保存订单确认表
         DateTime now = DateTime.now();
         ConfirmOrder confirmOrder = new ConfirmOrder();
@@ -119,6 +143,10 @@ public class ConfirmOrderService {
         confirmOrderMapper.insert(confirmOrder);
 
         // 查出余票记录，需要得到真实的库存
+        // 可能会发生超卖问题：假设库存为1，多个线程同时读到余票记录，都认为库存为1，就都往后去选座购票，最终导致超卖
+        // 解决方案：
+        //      1.synchronized加锁->会导致吞吐量/TPS 变低，效率不高，且不适用于多节点环境（仍会超卖）
+        //      2.分布锁
         DailyTrainTicket dailyTrainTicket = dailyTrainTicketService.selectByUnique(date, trainCode, start, end);
         LOG.info("查出余票记录：{}", dailyTrainTicket);
 
@@ -162,28 +190,13 @@ public class ConfirmOrderService {
             // 选座
             // 一个车箱一个车箱的获取座位数据
             // 挑选符合条件的座位，如果这个车箱不满足，则进入下个车箱（多个选座应该在同一个车厢内）
-            getSeat(finalSeatList,
-                    date,
-                    trainCode,
-                    ticketReq0.getSeatTypeCode(),
-                    ticketReq0.getSeat().split("")[0], // 第一个座位的列名，如从A1得到A
-                    offsetList,
-                    dailyTrainTicket.getStartIndex(),
-                    dailyTrainTicket.getEndIndex()
-            );
+            getSeat(finalSeatList, date, trainCode, ticketReq0.getSeatTypeCode(), ticketReq0.getSeat().split("")[0], // 第一个座位的列名，如从A1得到A
+                    offsetList, dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex());
 
         } else {
             LOG.info("本次购票没有选座");
             for (ConfirmOrderTicketReq ticketReq : tickets) {
-                getSeat(finalSeatList,
-                        date,
-                        trainCode,
-                        ticketReq.getSeatTypeCode(),
-                        null,
-                        null,
-                        dailyTrainTicket.getStartIndex(),
-                        dailyTrainTicket.getEndIndex()
-                );
+                getSeat(finalSeatList, date, trainCode, ticketReq.getSeatTypeCode(), null, null, dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex());
             }
         }
         LOG.info("最终选座：{}", finalSeatList);
@@ -199,6 +212,8 @@ public class ConfirmOrderService {
             LOG.error("保存购票信息失败", e);
             throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_EXCEPTION);
         }
+        LOG.info("购票流程结束，释放锁。lockKey：{}", dlKey);
+        redisTemplate.delete(dlKey);
     }
 
     private static void reduceTickets(ConfirmOrderDoReq req, DailyTrainTicket dailyTrainTicket) {
@@ -373,8 +388,7 @@ public class ConfirmOrderService {
             String newSell = NumberUtil.getBinaryStr(newSellInt);
             // 01111, 01110
             newSell = StrUtil.fillBefore(newSell, '0', sell.length());
-            LOG.info("座位{}被选中，原售票信息：{}，车站区间：{}~{}，即：{}，最终售票信息：{}"
-                    , dailyTrainSeat.getCarriageSeatIndex(), sell, startIndex, endIndex, curSell, newSell);
+            LOG.info("座位{}被选中，原售票信息：{}，车站区间：{}~{}，即：{}，最终售票信息：{}", dailyTrainSeat.getCarriageSeatIndex(), sell, startIndex, endIndex, curSell, newSell);
             dailyTrainSeat.setSell(newSell);
             return true;
 
