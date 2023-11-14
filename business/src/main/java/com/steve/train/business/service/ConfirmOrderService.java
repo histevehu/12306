@@ -7,6 +7,8 @@ import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -27,6 +29,7 @@ import com.steve.train.common.resp.PageResp;
 import com.steve.train.common.util.SnowFlakeUtil;
 import jakarta.annotation.Resource;
 import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +72,8 @@ public class ConfirmOrderService {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    /*@Autowired
-    private RedissonClient redissonClient;*/
+    @Autowired
+    private RedissonClient redissonClient;
 
 
     public void save(ConfirmOrderDoReq req) {
@@ -113,6 +116,7 @@ public class ConfirmOrderService {
         confirmOrderMapper.deleteByPrimaryKey(id);
     }
 
+    @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
     public void doConfirm(ConfirmOrderDoReq req) throws InterruptedException {
         // TODO:省略业务数据校验，如：车次是否存在、余票是否存在、车次是否在有效期内、tickets条数>0
         // TODO:省略同乘客同车次是否已经买过
@@ -131,7 +135,7 @@ public class ConfirmOrderService {
         // 问题1：线程执行时间超过锁时间，会导致锁失效，从而出现超卖
         // 解决方案1：引入看门狗（守护线程）（项目主流使用此方案）：定时查询锁剩余时间，当小于一定值时自动延时。使用守护线程的好处是会随主线程的结束而结束，所以不会出现一直重置而永不过期的问题
         // 使用看门狗守护进程方案：
-        RLock lock = null;
+        RLock lock = redissonClient.getLock(dlKey);
         boolean watchDogLock = lock.tryLock(0, TimeUnit.SECONDS);
         if (watchDogLock) {
             LOG.info("看门狗获得分布式锁成功");
@@ -252,6 +256,14 @@ public class ConfirmOrderService {
             }
         }
 
+    }
+
+    /**
+     * 降级方法，需包含限流原方法的所有参数+BlockException参数
+     */
+    public void doConfirmBlock(ConfirmOrderDoReq req, BlockException e) {
+        LOG.info("购票请求被限流：{}", req);
+        throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_FLOW_EXCEPTION);
     }
 
     private static void reduceTickets(ConfirmOrderDoReq req, DailyTrainTicket dailyTrainTicket) {
