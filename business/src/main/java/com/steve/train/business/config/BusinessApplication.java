@@ -1,8 +1,5 @@
 package com.steve.train.business.config;
 
-import com.alibaba.csp.sentinel.slots.block.RuleConstant;
-import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
-import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +9,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @SpringBootApplication
 // Springboot默认扫描Application所在包及其子包内的组件。
@@ -36,14 +30,16 @@ public class BusinessApplication {
         Environment env = app.run(args).getEnvironment();
         LOG.info("Business Application，启动！");
         LOG.info("Root URL: http://localhost:{}{}", env.getProperty("server.port"), env.getProperty("server.servlet.context-path"));
-        initFlowRules();
-        LOG.info("Sentinel限流规则已定义");
+        // Business模块的Sentinel限流规则已经通过Nacos持久化
+        // initFlowRules();
+        // LOG.info("Sentinel限流规则已定义");
     }
 
     /**
-     * 初始化限流规则，可通过Sentinel控制台覆盖配置
+     * 初始化限流规则。
+     * 也可通过Sentinel控制台动态覆盖配置，但是此方法是通过推送到应用生效的，规则保存在应用的内存中。若应用重启则规则丢失了。
      */
-    private static void initFlowRules() {
+    /*private static void initFlowRules() {
         List<FlowRule> rules = new ArrayList<>();
         FlowRule rule = new FlowRule();
         rule.setResource("doConfirm");
@@ -52,6 +48,6 @@ public class BusinessApplication {
         rule.setCount(20);
         rules.add(rule);
         FlowRuleManager.loadRules(rules);
-    }
+    }*/
 
 }
