@@ -41,7 +41,7 @@ public class BusinessApplication {
     }
 
     /**
-     * 初始化限流规则
+     * 初始化限流规则，可通过Sentinel控制台覆盖配置
      */
     private static void initFlowRules() {
         List<FlowRule> rules = new ArrayList<>();
