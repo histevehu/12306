@@ -16,15 +16,17 @@ import com.steve.train.business.resp.SkTokenQueryResp;
 import com.steve.train.common.resp.PageResp;
 import com.steve.train.common.util.SnowFlakeUtil;
 import jakarta.annotation.Resource;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /*
  * @author     : Steve Hu
@@ -49,7 +51,7 @@ public class SkTokenService {
     private SkTokenMapperCust skTokenMapperCust;
 
     @Autowired
-    private StringRedisTemplate redisTemplate;
+    private RedissonClient redissonClient;
 
     @Value("${spring.profiles.active}")
     private String env;
@@ -128,8 +130,25 @@ public class SkTokenService {
     // TODO: 将验证精度细分到作为类型（当前令牌验证精度为车次。可能出现某一个类型座位大量用户抢购而耗尽令牌，导致其他类型的座位无法购买）
     public boolean validSkToken(Date date, String trainCode, Long memberId) {
         LOG.info("会员【{}】获取日期【{}】车次【{}】的令牌开始", memberId, DateUtil.formatDate(date), trainCode);
-        // 令牌约等于库存，也起到库存校验作用。令牌没有了，就不再卖票，不需要再进入购票主流程去判断库存，判断令牌肯定比判断库存效率高
-        int updateCount = skTokenMapperCust.decrease(date, trainCode, 1);
-        return updateCount > 0;
+        String dlKey = DateUtil.formatDate(date) + "-" + trainCode;
+        try {
+            // 使用看门狗方案对令牌添加分布锁
+            RLock lock = redissonClient.getLock(dlKey);
+            boolean watchDogLock = lock.tryLock(0, TimeUnit.SECONDS);
+            if (watchDogLock) {
+                LOG.info("validSkToken看门狗获得分布式锁成功");
+            } else {
+                LOG.warn("validSkToken看门狗获得分布式锁失败");
+                return false;
+            }
+            // 令牌约等于库存，也起到库存校验作用。令牌没有了，就不再卖票，不需要再进入购票主流程去判断库存，判断令牌肯定比判断库存效率高
+            int updateCount = skTokenMapperCust.decrease(date, trainCode, 1);
+            return updateCount > 0;
+        } catch (InterruptedException e) {
+            LOG.error("令牌获取异常:", e);
+            return false;
+        } finally {
+            LOG.info("此处业务不应释放令牌锁，防止机器人抢票");
+        }
     }
 }
