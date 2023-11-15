@@ -66,6 +66,12 @@
             业务管理
           </span>
         </template>
+        <a-menu-item key="/business/skToken">
+          <router-link to="/business/skToken">
+            <MenuUnfoldOutlined/>
+            令牌管理
+          </router-link>
+        </a-menu-item>
         <a-menu-item key="/business/confirmOrder">
           <router-link to="/business/confirmOrder">
             <MenuUnfoldOutlined/>

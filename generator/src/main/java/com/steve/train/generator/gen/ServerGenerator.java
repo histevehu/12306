@@ -16,7 +16,7 @@ import java.util.*;
 
 public class ServerGenerator {
     // 指定vue生成的页面是否只读，若为只读页面则只能查询数据，无法增删改
-    static boolean readOnly = true;
+    static boolean readOnly = false;
     static String vuePath = "admin/src/views/";
     // 后端接口、服务、实体类生成路径
     static String serverPath = "[module]/src/main/java/com/steve/train/[module]/";
@@ -85,11 +85,11 @@ public class ServerGenerator {
         param.put("readOnly", readOnly);
         System.out.println("组装参数：" + param);
 
-        genJava(Domain, param, "service", "service");
-        genJava(Domain, param, "controller/admin", "adminController");
-        genJava(Domain, param, "req", "saveReq");
-        genJava(Domain, param, "req", "queryReq");
-        genJava(Domain, param, "resp", "queryResp");
+        // genJava(Domain, param, "service", "service");
+        // genJava(Domain, param, "controller/admin", "adminController");
+        // genJava(Domain, param, "req", "saveReq");
+        // genJava(Domain, param, "req", "queryReq");
+        // genJava(Domain, param, "resp", "queryResp");
 
         genVue(Domain, param);
     }
