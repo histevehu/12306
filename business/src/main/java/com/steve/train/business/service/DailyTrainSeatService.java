@@ -138,6 +138,10 @@ public class DailyTrainSeatService {
         return (int) l;
     }
 
+    public int countSeat(Date date, String trainCode) {
+        return countSeat(date, trainCode, null);
+    }
+
     public List<DailyTrainSeat> selectByCarriage(Date date, String trainCode, Integer carriageIndex) {
         DailyTrainSeatExample example = new DailyTrainSeatExample();
         example.setOrderByClause("carriage_seat_index asc");
