@@ -3,6 +3,7 @@ package com.steve.train.business.service;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -132,7 +133,7 @@ public class ConfirmOrderService {
             throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_SK_TOKEN_FAIL);
         }
         // 为该日期该车次生成Redis分布式锁key
-        String dlKey = req.getDate() + "-" + req.getTrainCode();
+        String dlKey = DateUtil.formatDate(req.getDate()) + "-" + req.getTrainCode();
         // 获取基本的Redis分布锁
         /* Boolean redisDL = redisTemplate.opsForValue().setIfAbsent(dlKey, dlKey, 60, TimeUnit.SECONDS);
         if (Boolean.TRUE.equals(redisDL)) {

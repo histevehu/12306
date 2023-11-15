@@ -1,6 +1,7 @@
 package com.steve.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -8,6 +9,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.steve.train.business.domain.SkToken;
 import com.steve.train.business.domain.SkTokenExample;
+import com.steve.train.business.enums.DLKeyTypeEnum;
 import com.steve.train.business.mapper.SkTokenMapper;
 import com.steve.train.business.mapper.custom.SkTokenMapperCust;
 import com.steve.train.business.req.SkTokenQueryReq;
@@ -22,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -49,6 +52,9 @@ public class SkTokenService {
 
     @Resource
     private SkTokenMapperCust skTokenMapperCust;
+
+    @Resource
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private RedissonClient redissonClient;
@@ -139,11 +145,55 @@ public class SkTokenService {
                 LOG.info("validSkToken看门狗获得分布式锁成功");
             } else {
                 LOG.warn("validSkToken看门狗获得分布式锁失败");
+                // 令牌锁获取失败，验证令牌失败
                 return false;
             }
-            // 令牌约等于库存，也起到库存校验作用。令牌没有了，就不再卖票，不需要再进入购票主流程去判断库存，判断令牌肯定比判断库存效率高
-            int updateCount = skTokenMapperCust.decrease(date, trainCode, 1);
-            return updateCount > 0;
+            String skTokenCountKey = DLKeyTypeEnum.SK_TOKEN_COUNT + "-" + DateUtil.formatDate(date) + "-" + trainCode;
+            Object skTokenCount = redisTemplate.opsForValue().get(skTokenCountKey);
+            if (skTokenCount != null) {
+                LOG.info("缓存中有{}车次令牌大闸的key", skTokenCountKey);
+                // redis decr将存储在键上的数字减1。如果键不存在，则在执行操作前将其设置为0。
+                Long count = redisTemplate.opsForValue().decrement(skTokenCountKey, 1);
+                // 若返回值小于0，说明令牌已经耗尽
+                if (count < 0L) {
+                    LOG.error("获取令牌失败：{}", skTokenCountKey);
+                    return false;
+                } else {
+                    LOG.info("获取令牌后，令牌余数：{}", count);
+                    // 将令牌缓存时间重置，防止缓存击穿
+                    redisTemplate.expire(skTokenCountKey, 60, TimeUnit.SECONDS);
+                    // 每获取5个令牌同步一次令牌数据库
+                    if (count % 5 == 0) {
+                        skTokenMapperCust.decrease(date, trainCode, 5);
+                    }
+                    return true;
+                }
+            } else {
+                LOG.info("缓存中没有{}车次令牌大闸的key", skTokenCountKey);
+                // 检查是否还有令牌
+                SkTokenExample skTokenExample = new SkTokenExample();
+                skTokenExample.createCriteria().andDateEqualTo(date).andTrainCodeEqualTo(trainCode);
+                // 根据日期+车次查询令牌记录（包含耗尽的令牌）
+                List<SkToken> tokenCountList = skTokenMapper.selectByExample(skTokenExample);
+                if (CollUtil.isEmpty(tokenCountList)) {
+                    LOG.info("找不到日期【{}】车次【{}】的令牌记录", DateUtil.formatDate(date), trainCode);
+                    return false;
+                }
+                SkToken skToken = tokenCountList.get(0);
+                if (skToken.getCount() <= 0) {
+                    LOG.info("日期【{}】车次【{}】的令牌余量为0", DateUtil.formatDate(date), trainCode);
+                    return false;
+                }
+                // 令牌还有余量
+                // 令牌余数-1
+                Integer count = skToken.getCount() - 1;
+                skToken.setCount(count);
+                LOG.info("将该车次令牌大闸放入缓存中，key: {}， count: {}", skTokenCountKey, count);
+                // 令牌更新后放入缓存和数据库
+                redisTemplate.opsForValue().set(skTokenCountKey, String.valueOf(count), 60, TimeUnit.SECONDS);
+                skTokenMapper.updateByPrimaryKey(skToken);
+                return true;
+            }
         } catch (InterruptedException e) {
             LOG.error("令牌获取异常:", e);
             return false;
