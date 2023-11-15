@@ -5,11 +5,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+/**
+ * Business Feign 熔断降级处理类
+ */
 @Component
 public class BusinessFeignFallback implements BusinessFeign {
     @Override
     public String hello() {
-        return "Fallback";
+        return "Business Fallback";
     }
 
     @Override
