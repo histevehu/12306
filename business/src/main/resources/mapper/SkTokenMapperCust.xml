@@ -6,6 +6,10 @@
         set `count` = if(`count` &lt; #{decreaseCount}, 0, `count` - #{decreaseCount})
         where `date` = #{date}
           and train_code = #{trainCode}
+          -- and `count`>0 的作用：
+          -- 因为decrease()作用是使用令牌，并返回记录修改的行数。
+          -- 若count=0时，使用这个条件将不会更新记录，返回0，表示没有符合条件的记录。
+          -- 若不使用此条件Mybatis仍将原地更新记录，返回1，无法判断是否存在符合条件的令牌记录。
           and `count` > 0
     </update>
 </mapper>

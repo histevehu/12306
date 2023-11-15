@@ -63,6 +63,9 @@ public class ConfirmOrderService {
     @Resource
     private AfterConfirmOrderService afterConfirmOrderService;
 
+    @Resource
+    private SkTokenService skTokenService;
+
     /**
      * 注意：@AutoWired按byType自动注入，⽽@Resource默认按byName自动注入，即直接根据bean的ID进⾏注⼊。<br><br>
      * 使用JDK的@Resource:会根据变量名去查找原始类。比如，在 {@link RedisController}中我们声明了变量{@link RedisController#redisTemplate}，JDK会根据变量名查找{@link RedisTemplate}类并注入。而在这里如果我们将{@link StringRedisTemplate}类型的变量命名为{@link ConfirmOrderService#redisTemplate}则JDK会找到{@link RedisTemplate}类，这与声明的{@link StringRedisTemplate}不符，则会报错：Bean named 'redisTemplate' is expected to be of type 'org.springframework.data.redis.core.StringRedisTemplate' but was actually of type 'org.springframework.data.redis.core.RedisTemplate'。<br><br>
@@ -116,10 +119,18 @@ public class ConfirmOrderService {
         confirmOrderMapper.deleteByPrimaryKey(id);
     }
 
+    // TODO:省略业务数据校验，如：车次是否存在、余票是否存在、车次是否在有效期内、tickets条数>0
+    // TODO:省略同乘客同车次是否已经买过
     @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
     public void doConfirm(ConfirmOrderDoReq req) throws InterruptedException {
-        // TODO:省略业务数据校验，如：车次是否存在、余票是否存在、车次是否在有效期内、tickets条数>0
-        // TODO:省略同乘客同车次是否已经买过
+        // 校验令牌余量
+        boolean validSkToken = skTokenService.validSkToken(req.getDate(), req.getTrainCode(), MemberLoginContext.getId());
+        if (validSkToken) {
+            LOG.info("令牌校验通过");
+        } else {
+            LOG.info("令牌校验不通过");
+            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_SK_TOKEN_FAIL);
+        }
         // 为该日期该车次生成Redis分布式锁key
         String dlKey = req.getDate() + "-" + req.getTrainCode();
         // 获取基本的Redis分布锁

@@ -125,4 +125,11 @@ public class SkTokenService {
         skTokenMapper.deleteByPrimaryKey(id);
     }
 
+    // TODO: 将验证精度细分到作为类型（当前令牌验证精度为车次。可能出现某一个类型座位大量用户抢购而耗尽令牌，导致其他类型的座位无法购买）
+    public boolean validSkToken(Date date, String trainCode, Long memberId) {
+        LOG.info("会员【{}】获取日期【{}】车次【{}】的令牌开始", memberId, DateUtil.formatDate(date), trainCode);
+        // 令牌约等于库存，也起到库存校验作用。令牌没有了，就不再卖票，不需要再进入购票主流程去判断库存，判断令牌肯定比判断库存效率高
+        int updateCount = skTokenMapperCust.decrease(date, trainCode, 1);
+        return updateCount > 0;
+    }
 }
