@@ -122,7 +122,7 @@
         </template>
       </a-input>
     </p>
-    <a-button type="danger" block @click="handleOk">输入验证码后开始购票</a-button>
+    <a-button type="danger" block :loading="btn_buying" @click="handleOk">输入验证码后开始购票</a-button>
   </a-modal>
 
   <!-- 第一层验证码 纯前端 -->
@@ -346,7 +346,9 @@ export default defineComponent({
       visible.value = true;
     };
 
+    const btn_buying = ref(false);
     const handleOk = () => {
+      btn_buying.value=true;
       if (Tool.isEmpty(imageCode.value)) {
         notification.error({description: '验证码不能为空'});
         return;
@@ -389,6 +391,7 @@ export default defineComponent({
         imageCode: imageCode.value,
         lineNumber: lineNumber.value
       }).then((response) => {
+        btn_buying.value=false;
         let data = response.data;
         if (data.success) {
           notification.success({description: "下单成功！"});
@@ -552,7 +555,8 @@ export default defineComponent({
       confirmOrderId,
       confirmOrderLineCount,
       onCancelOrder,
-      lineNumber
+      lineNumber,
+      btn_buying
     };
   },
 });

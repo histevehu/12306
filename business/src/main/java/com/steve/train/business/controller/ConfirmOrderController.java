@@ -2,6 +2,7 @@ package com.steve.train.business.controller;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.steve.train.business.enums.RedisKeyTypeEnum;
 import com.steve.train.business.req.ConfirmOrderDoReq;
 import com.steve.train.business.service.ConfirmOrderService;
 import com.steve.train.common.exception.BusinessExceptionEnum;
@@ -36,7 +37,7 @@ public class ConfirmOrderController {
         // 图形验证码校验
         String imageCodeToken = req.getImageCodeToken();
         String imageCode = req.getImageCode();
-        String imageCodeRedis = redisTemplate.opsForValue().get(imageCodeToken);
+        String imageCodeRedis = redisTemplate.opsForValue().get(RedisKeyTypeEnum.KAPTCHA.getCode() + "-" + imageCodeToken);
         LOG.info("从redis中获取到的验证码：{}", imageCodeRedis);
         if (ObjectUtils.isEmpty(imageCodeRedis)) {
             return new CommonResp<>(false, "验证码已过期", null);
@@ -45,7 +46,7 @@ public class ConfirmOrderController {
         if (!imageCodeRedis.equalsIgnoreCase(imageCode)) {
             return new CommonResp<>(false, "验证码不正确", null);
         } else {
-            // 验证通过后，移除验证码
+            // 验证通过后，移除验证码缓存
             redisTemplate.delete(imageCodeToken);
         }
         // 后端验证码校验通过，执行业务逻辑

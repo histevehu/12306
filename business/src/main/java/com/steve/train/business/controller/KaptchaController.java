@@ -1,6 +1,7 @@
 package com.steve.train.business.controller;
 
 import com.google.code.kaptcha.impl.DefaultKaptcha;
+import com.steve.train.business.enums.RedisKeyTypeEnum;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,13 +29,14 @@ public class KaptchaController {
     public StringRedisTemplate stringRedisTemplate;
 
     @GetMapping("/image-code/{imageCodeToken}")
-    public void imageCode(@PathVariable(value = "imageCodeToken") String imageCodeToken, HttpServletResponse httpServletResponse) throws Exception{
+    public void imageCode(@PathVariable(value = "imageCodeToken") String imageCodeToken, HttpServletResponse httpServletResponse) throws Exception {
         ByteArrayOutputStream jpegOutputStream = new ByteArrayOutputStream();
         try {
             // 生成验证码字符串
             String createText = defaultKaptcha.createText();
+            String redisKaptchaKey = RedisKeyTypeEnum.KAPTCHA.getCode() + "-" + imageCodeToken;
             // 将生成的验证码以<token,验证码>形式存入redis缓存中，并设置过期时间
-            stringRedisTemplate.opsForValue().set(imageCodeToken, createText, 300, TimeUnit.SECONDS);
+            stringRedisTemplate.opsForValue().set(redisKaptchaKey, createText, 300, TimeUnit.SECONDS);
             // 使用验证码字符串生成验证码图片
             BufferedImage challenge = defaultKaptcha.createImage(createText);
             ImageIO.write(challenge, "jpg", jpegOutputStream);
