@@ -16,6 +16,7 @@ import com.github.pagehelper.PageInfo;
 import com.steve.train.business.controller.RedisController;
 import com.steve.train.business.domain.*;
 import com.steve.train.business.enums.ConfirmOrderStatusEnum;
+import com.steve.train.business.enums.RedisKeyTypeEnum;
 import com.steve.train.business.enums.SeatTypeEnum;
 import com.steve.train.business.mapper.ConfirmOrderMapper;
 import com.steve.train.business.req.ConfirmOrderDoReq;
@@ -125,15 +126,15 @@ public class ConfirmOrderService {
     @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
     public void doConfirm(ConfirmOrderDoReq req) throws InterruptedException {
         // 校验令牌余量
-        boolean validSkToken = skTokenService.validSkToken(req.getDate(), req.getTrainCode(), MemberLoginContext.getId());
-        if (validSkToken) {
+        String dlSkTokenKey = skTokenService.validSkToken(req.getDate(), req.getTrainCode(), MemberLoginContext.getId());
+        if (StrUtil.isNotEmpty(dlSkTokenKey)) {
             LOG.info("令牌校验通过");
         } else {
             LOG.info("令牌校验不通过");
             throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_SK_TOKEN_FAIL);
         }
         // 为该日期该车次生成Redis分布式锁key
-        String dlKey = DateUtil.formatDate(req.getDate()) + "-" + req.getTrainCode();
+        String dlConfirmKey = RedisKeyTypeEnum.DL_CONFIRM_ORDER.getCode() + "-" + DateUtil.formatDate(req.getDate()) + "-" + req.getTrainCode();
         // 获取基本的Redis分布锁
         /* Boolean redisDL = redisTemplate.opsForValue().setIfAbsent(dlKey, dlKey, 60, TimeUnit.SECONDS);
         if (Boolean.TRUE.equals(redisDL)) {
@@ -147,8 +148,8 @@ public class ConfirmOrderService {
         // 问题1：线程执行时间超过锁时间，会导致锁失效，从而出现超卖
         // 解决方案1：引入看门狗（守护线程）（项目主流使用此方案）：定时查询锁剩余时间，当小于一定值时自动延时。使用守护线程的好处是会随主线程的结束而结束，所以不会出现一直重置而永不过期的问题
         // 使用看门狗守护进程方案：
-        RLock lock = redissonClient.getLock(dlKey);
-        boolean watchDogLock = lock.tryLock(0, TimeUnit.SECONDS);
+        RLock dlConfirm = redissonClient.getLock(dlConfirmKey);
+        boolean watchDogLock = dlConfirm.tryLock(0, TimeUnit.SECONDS);
         if (watchDogLock) {
             LOG.info("看门狗获得分布式锁成功");
         } else {
@@ -261,10 +262,11 @@ public class ConfirmOrderService {
                 throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_EXCEPTION);
             }
         } finally {
-            LOG.info("购票流程结束，释放锁。lockKey：{}", dlKey);
             // 当分布锁非空且为当前线程所持有时，释放锁
-            if (null != lock && lock.isHeldByCurrentThread()) {
-                lock.unlock();
+            // 释放购票分布锁
+            if (null != dlConfirm && dlConfirm.isHeldByCurrentThread()) {
+                LOG.info("购票流程结束，释放购票分布锁。key：{}", dlConfirmKey);
+                dlConfirm.unlock();
             }
         }
 
