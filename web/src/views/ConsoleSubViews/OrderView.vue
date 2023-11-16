@@ -447,7 +447,7 @@ export default defineComponent({
     const imageCodeSrc = ref();
     const imageCode = ref();
     /**
-     * 加载图形验证码
+     * 初始化后端验证码请求参数
      */
     const loadImageCode = () => {
       imageCodeToken.value = Tool.uuid(8);
@@ -489,6 +489,7 @@ export default defineComponent({
       if (parseInt(firstImageCodeTarget.value) === parseInt(firstImageCodeSourceA.value + firstImageCodeSourceB.value)) {
         // 第一层验证通过
         firstImageCodeModalVisible.value = false;
+        // 进入第二层后端验证码验证
         showImageCodeModal();
       } else {
         notification.error({description: '验证码错误'});
