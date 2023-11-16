@@ -24,6 +24,7 @@ public class TicketController {
     @GetMapping("/queryList")
     public CommonResp<PageResp<TicketQueryResp>> query(@Valid TicketQueryReq req) {
         CommonResp<PageResp<TicketQueryResp>> commonResp = new CommonResp<>();
+        // TicketController和TicketAdminController都调用ticketService，但TicketController在调用前向请求增加当前用户的id以仅查找当前用户的车票
         req.setMemberId(MemberLoginContext.getId());
         PageResp<TicketQueryResp> pageResp = ticketService.queryList(req);
         commonResp.setContent(pageResp);
