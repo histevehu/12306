@@ -6,6 +6,7 @@ import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.fastjson.JSON;
 import com.steve.train.business.domain.ConfirmOrder;
+import com.steve.train.business.dto.ConfirmOrderMQDTO;
 import com.steve.train.business.enums.ConfirmOrderStatusEnum;
 import com.steve.train.business.enums.RocketMQTopicEnum;
 import com.steve.train.business.mapper.ConfirmOrderMapper;
@@ -79,8 +80,13 @@ public class BeforeConfirmOrderService {
         confirmOrder.setTickets(JSON.toJSONString(tickets));
         confirmOrderMapper.insert(confirmOrder);
         // 发送MQ排队购票
-        req.setLogId(MDC.get("LOG_ID"));
-        String reqJson = JSON.toJSONString(req);
+        ConfirmOrderMQDTO confirmOrderMQDTO = new ConfirmOrderMQDTO();
+        confirmOrderMQDTO.setDate(req.getDate());
+        confirmOrderMQDTO.setTrainCode(req.getTrainCode());
+        // 由于使用MQ异步处理启用了新的线程，所以原服务中的事件流水号不会自动传递过来，需要通过req对象传递
+        // 同理，若使用Spring自带的@Async，也需要手动传递事件流水号
+        confirmOrderMQDTO.setLogId(MDC.get("LOG_ID"));
+        String reqJson = JSON.toJSONString(confirmOrderMQDTO);
         LOG.info("购票请求，发送mq开始，消息：{}", reqJson);
         rocketMQTemplate.convertAndSend(RocketMQTopicEnum.CONFIRM_ORDER.getCode(), reqJson);
         LOG.info("购票请求，发送mq结束");

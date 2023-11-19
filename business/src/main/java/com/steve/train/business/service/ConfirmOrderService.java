@@ -124,6 +124,8 @@ public class ConfirmOrderService {
     // TODO:省略同乘客同车次是否已经买过
     @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
     public void doConfirm(ConfirmOrderDoReq req) {
+        // 由于使用MQ异步处理启用了新的线程，所以原服务中的事件流水号不会自动传递过来，需要通过req对象传递
+        // 同理，若使用Spring自带的@Async，也需要手动传递事件流水号
         MDC.put("LOG_ID", req.getLogId());
         LOG.info("异步出票开始：{}", req);
         // 为该日期该车次生成Redis分布式锁key
