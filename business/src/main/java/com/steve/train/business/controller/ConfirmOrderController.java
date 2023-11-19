@@ -4,6 +4,7 @@ import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.steve.train.business.enums.RedisKeyTypeEnum;
 import com.steve.train.business.req.ConfirmOrderDoReq;
+import com.steve.train.business.service.BeforeConfirmOrderService;
 import com.steve.train.business.service.ConfirmOrderService;
 import com.steve.train.common.exception.BusinessExceptionEnum;
 import com.steve.train.common.resp.CommonResp;
@@ -27,6 +28,8 @@ public class ConfirmOrderController {
 
     private final static Logger LOG = LoggerFactory.getLogger(ConfirmOrderController.class);
     @Resource
+    private BeforeConfirmOrderService beforeOrderService;
+    @Resource
     private ConfirmOrderService confirmOrderService;
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -49,8 +52,8 @@ public class ConfirmOrderController {
             // 验证通过后，移除验证码缓存
             redisTemplate.delete(imageCodeToken);
         }
-        // 后端验证码校验通过，执行业务逻辑
-        confirmOrderService.doConfirm(req);
+        // 后端验证码校验通过，执行业务前逻辑
+        beforeOrderService.beforeDoConfirm(req);
         return new CommonResp<>();
     }
 

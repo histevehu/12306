@@ -144,9 +144,9 @@ public class SkTokenService {
         String SKToken_Key = RedisKeyTypeEnum.DL_SK_TOKEN.getCode() + "-" + DateUtil.formatDate(date) + "-" + trainCode + "-" + memberId;
         Boolean setIfAbsent = redisTemplate.opsForValue().setIfAbsent(SKToken_Key, SKToken_Key, 10, TimeUnit.SECONDS);
         if (Boolean.TRUE.equals(setIfAbsent)) {
-            LOG.info("抢到令牌锁了！SKToken_Key：{}", SKToken_Key);
+            LOG.info("成功抢占令牌锁   SKToken_Key：{}", SKToken_Key);
         } else {
-            LOG.info("没抢到令牌锁！SKToken_Key：{}", SKToken_Key);
+            LOG.info("抢占令牌锁失败   SKToken_Key：{}", SKToken_Key);
             return null;
         }
         // 校验令牌余量

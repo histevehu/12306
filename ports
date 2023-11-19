@@ -11,4 +11,6 @@
 | Nacos                  | 配置注册中心           | 8100       |
 | Seata                  | 分布式事务            | 8101       |
 | Sentinel-dashboard     | 限流降级熔断-控制台     | 9000       |
+| RocketMQ-nameservice   | 消息队列              | 9001       |
+| RocketMQ-dashboard     | 消息队列-控制台        | 9002       |
 

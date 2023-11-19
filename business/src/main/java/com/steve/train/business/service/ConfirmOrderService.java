@@ -10,7 +10,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
-import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.steve.train.business.controller.RedisController;
@@ -23,7 +22,6 @@ import com.steve.train.business.req.ConfirmOrderDoReq;
 import com.steve.train.business.req.ConfirmOrderQueryReq;
 import com.steve.train.business.req.ConfirmOrderTicketReq;
 import com.steve.train.business.resp.ConfirmOrderQueryResp;
-import com.steve.train.common.context.MemberLoginContext;
 import com.steve.train.common.enums.SeatColEnum;
 import com.steve.train.common.exception.BusinessException;
 import com.steve.train.common.exception.BusinessExceptionEnum;
@@ -34,6 +32,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -124,15 +123,9 @@ public class ConfirmOrderService {
     // TODO:省略业务数据校验，如：车次是否存在、余票是否存在、车次是否在有效期内、tickets条数>0
     // TODO:省略同乘客同车次是否已经买过
     @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
-    public void doConfirm(ConfirmOrderDoReq req) throws InterruptedException {
-        // 校验令牌余量
-        String dlSkTokenKey = skTokenService.validSkToken(req.getDate(), req.getTrainCode(), MemberLoginContext.getId());
-        if (StrUtil.isNotEmpty(dlSkTokenKey)) {
-            LOG.info("令牌校验通过");
-        } else {
-            LOG.info("令牌校验不通过");
-            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_SK_TOKEN_FAIL);
-        }
+    public void doConfirm(ConfirmOrderDoReq req) {
+        MDC.put("LOG_ID", req.getLogId());
+        LOG.info("异步出票开始：{}", req);
         // 为该日期该车次生成Redis分布式锁key
         String dlConfirmKey = RedisKeyTypeEnum.DL_CONFIRM_ORDER.getCode() + "-" + DateUtil.formatDate(req.getDate()) + "-" + req.getTrainCode();
         // 获取基本的Redis分布锁
@@ -145,19 +138,28 @@ public class ConfirmOrderService {
             LOG.warn("获得分布式锁失败，lockKey：{}", dlKey);
             throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_LOCK_FAIL);
         }*/
+
         // 问题1：线程执行时间超过锁时间，会导致锁失效，从而出现超卖
         // 解决方案1：引入看门狗（守护线程）（项目主流使用此方案）：定时查询锁剩余时间，当小于一定值时自动延时。使用守护线程的好处是会随主线程的结束而结束，所以不会出现一直重置而永不过期的问题
         // 使用看门狗守护进程方案：
-        RLock dlConfirm = redissonClient.getLock(dlConfirmKey);
-        boolean watchDogLock = dlConfirm.tryLock(0, TimeUnit.SECONDS);
+        RLock dlConfirm = null;
+        boolean watchDogLock = false;
+        try {
+            dlConfirm = redissonClient.getLock(dlConfirmKey);
+            watchDogLock = dlConfirm.tryLock(0, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            LOG.warn("看门狗尝试获得购票分布锁发生错误，{}", e.getMessage());
+            throw new RuntimeException(e);
+        }
         if (watchDogLock) {
-            LOG.info("看门狗获得分布式锁成功");
+            LOG.info("看门狗获得购票分布锁成功");
         } else {
             // 只是没抢到锁，并不知道票抢完了没，所以提示稍候再试
             // LOG.info("很遗憾，没抢到锁！lockKey：{}", lockKey);
-            LOG.warn("看门狗获得分布式锁失败");
+            LOG.warn("看门狗获得购票分布锁失败");
             throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_LOCK_FAIL);
         }
+
         // 问题2：Redis集群宕机，不同的请求在新老结点中都获取到了锁
         // 解决方案2：Redis红锁，一个分布式锁由多个节点共同维护，每个节点通过竞争获得锁。算法要求至少半数以上的节点成功获取锁才算锁获取成功。由于开销大，项目一般很少使用。
         // 使用Redis红锁方案：（假设有3个节点，则至少要获得⌊3/2⌋+1=2个节点的锁）
@@ -169,33 +171,30 @@ public class ConfirmOrderService {
             if (tryRedLock) {
             ...后续代码同看门狗方案
             */
-        // 将加锁操作放在try-finally外，确保进入try时已经成功获得了锁，后续业务无论是否出现异常都将进入finally中释放锁，防止了加锁操作在try内无法获得锁后误释放了被占用的锁
+
         try {
-            // 订单入库，保存订单确认表
-            DateTime now = DateTime.now();
-            ConfirmOrder confirmOrder = new ConfirmOrder();
             Date date = req.getDate();
             String trainCode = req.getTrainCode();
             String start = req.getStart();
             String end = req.getEnd();
-            confirmOrder.setId(SnowFlakeUtil.getSnowFlakeNextId());
-            confirmOrder.setMemberId(MemberLoginContext.getId());
-            confirmOrder.setDate(date);
-            confirmOrder.setTrainCode(trainCode);
-            confirmOrder.setStart(start);
-            confirmOrder.setEnd(end);
-            confirmOrder.setDailyTrainTicketId(req.getDailyTrainTicketId());
-            confirmOrder.setStatus(ConfirmOrderStatusEnum.INIT.getCode());
-            confirmOrder.setCreateTime(now);
-            confirmOrder.setUpdateTime(now);
-            confirmOrder.setTickets(JSON.toJSONString(req.getTickets()));
-            confirmOrderMapper.insert(confirmOrder);
-
+            // 从数据库里查出状态初始订单
+            ConfirmOrderExample confirmOrderExample = new ConfirmOrderExample();
+            confirmOrderExample.setOrderByClause("id asc");
+            ConfirmOrderExample.Criteria criteria = confirmOrderExample.createCriteria();
+            criteria.andDateEqualTo(req.getDate())
+                    .andTrainCodeEqualTo(req.getTrainCode())
+                    .andMemberIdEqualTo(req.getMemberId())
+                    .andStatusEqualTo(ConfirmOrderStatusEnum.INIT.getCode());
+            List<ConfirmOrder> list = confirmOrderMapper.selectByExampleWithBLOBs(confirmOrderExample);
+            ConfirmOrder confirmOrder;
+            if (CollUtil.isEmpty(list)) {
+                LOG.info("找不到原始订单，结束");
+                return;
+            } else {
+                LOG.info("本次处理{}条确认订单", list.size());
+                confirmOrder = list.get(0);
+            }
             // 查出余票记录，需要得到真实的库存
-            // 可能会发生超卖问题：假设库存为1，多个线程同时读到余票记录，都认为库存为1，就都往后去选座购票，最终导致超卖
-            // 解决方案：
-            //      1.synchronized加锁->会导致吞吐量/TPS 变低，效率不高，且不适用于多节点环境（仍会超卖）
-            //      2.分布锁
             DailyTrainTicket dailyTrainTicket = dailyTrainTicketService.selectByUnique(date, trainCode, start, end);
             LOG.info("查出余票记录：{}", dailyTrainTicket);
 
