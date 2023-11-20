@@ -46,9 +46,10 @@ public class BeforeConfirmOrderService {
 
     /**
      * 业务前逻辑。先进行令牌校验，若通过则将订单发送MQ以完成购票的后半程业务流程完成购票
+     * @return 订单ID
      */
     @SentinelResource(value = "beforeDoConfirm", blockHandler = "beforeDoConfirmBlock")
-    public void beforeDoConfirm(ConfirmOrderDoReq req) throws InterruptedException {
+    public long beforeDoConfirm(ConfirmOrderDoReq req) throws InterruptedException {
         // 根据线程上下文获取用户ID插入到请求中
         req.setMemberId(MemberLoginContext.getId());
         // 校验并尝试获取令牌
@@ -91,6 +92,7 @@ public class BeforeConfirmOrderService {
         LOG.info("购票请求，发送mq开始，消息：{}", reqJson);
         rocketMQTemplate.convertAndSend(RocketMQTopicEnum.CONFIRM_ORDER.getCode(), reqJson);
         LOG.info("购票请求，发送mq结束");
+        return confirmOrder.getId();
     }
 
     public void beforeDoConfirmBlock(ConfirmOrderDoReq req, BlockException e) {

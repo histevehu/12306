@@ -522,12 +522,38 @@ public class ConfirmOrderService {
         }
     }
 
+
     /**
-     * TODO:查询前面有几个人在排队
+     * 查询订单处理状态
      *
-     * @param id
+     * @param id 订单ID
+     * @return 返回状态码或者实际排队数量
      */
     public Integer queryLineCount(Long id) {
-        return -1;
+        ConfirmOrder confirmOrder = confirmOrderMapper.selectByPrimaryKey(id);
+        ConfirmOrderStatusEnum statusEnum = EnumUtil.getBy(ConfirmOrderStatusEnum::getCode, confirmOrder.getStatus());
+        return switch (statusEnum) {
+            case PENDING -> 0; // 排队0
+            case SUCCESS -> -1; // 成功
+            case FAILURE -> -2; // 失败
+            case EMPTY -> -3; // 无票
+            case CANCEL -> -4; // 取消
+            case INIT -> {
+                // 需要查表得到实际排队数量
+                // 排在第几位，下面的写法：where a=1 and (b=1 or c=1)不支持，但等价于Mybatis支持的 where (a=1 and b=1) or (a=1 and c=1)
+                ConfirmOrderExample confirmOrderExample = new ConfirmOrderExample();
+                // 获取该日期车次中创建时间在本订单之前的处于初始化或排队状态的订单数量
+                confirmOrderExample.or().andDateEqualTo(confirmOrder.getDate())
+                        .andTrainCodeEqualTo(confirmOrder.getTrainCode())
+                        .andCreateTimeLessThan(confirmOrder.getCreateTime())
+                        .andStatusEqualTo(ConfirmOrderStatusEnum.INIT.getCode());
+                confirmOrderExample.or().andDateEqualTo(confirmOrder.getDate())
+                        .andTrainCodeEqualTo(confirmOrder.getTrainCode())
+                        .andCreateTimeLessThan(confirmOrder.getCreateTime())
+                        .andStatusEqualTo(ConfirmOrderStatusEnum.PENDING.getCode());
+                yield Math.toIntExact(confirmOrderMapper.countByExample(confirmOrderExample));
+            }
+        };
     }
+
 }

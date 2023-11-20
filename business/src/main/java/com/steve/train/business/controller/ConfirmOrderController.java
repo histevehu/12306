@@ -58,9 +58,10 @@ public class ConfirmOrderController {
                 redisTemplate.delete(imageCodeToken);
             }
         }
-        // 后端验证码校验通过，执行业务前逻辑
-        beforeOrderService.beforeDoConfirm(req);
-        return new CommonResp<>();
+        // 后端验证码校验通过，执行业务前逻辑，若成功则返回订单id
+        long id = beforeOrderService.beforeDoConfirm(req);
+        // long类型需要手动转为字符串类型，否则出现精度丢失
+        return new CommonResp<>(String.valueOf(id));
     }
 
     @GetMapping("/queryLineCount/{id}")

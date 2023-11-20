@@ -157,6 +157,21 @@
     <br/>
     <a-button type="danger" @click="onCancelOrder">取消购票</a-button>
   </a-modal>
+  <a-modal v-model:visible="lineModalVisible" title="系统正在处理中" :footer="null" :maskClosable="false" :closable="false"
+           style="top: 50px; width: 400px">
+    <div class="book-line">
+      <div v-show="confirmOrderLineCount < 0">
+        <loading-outlined/>
+        请稍后...
+      </div>
+      <div v-show="confirmOrderLineCount >= 0">
+        <loading-outlined/>
+        您前面还有{{ confirmOrderLineCount }}位用户在购票，排队中，请稍候
+      </div>
+    </div>
+    <br/>
+    <a-button type="danger" @click="onCancelOrder">取消购票</a-button>
+  </a-modal>
 </template>
 
 <script>
@@ -348,7 +363,7 @@ export default defineComponent({
 
     const btn_buying = ref(false);
     const handleOk = () => {
-      btn_buying.value=true;
+      btn_buying.value = true;
       if (Tool.isEmpty(imageCode.value)) {
         notification.error({description: '验证码不能为空'});
         return;
@@ -391,15 +406,15 @@ export default defineComponent({
         imageCode: imageCode.value,
         lineNumber: lineNumber.value
       }).then((response) => {
-        btn_buying.value=false;
+        btn_buying.value = false;
         let data = response.data;
         if (data.success) {
           notification.success({description: "下单成功！"});
           visible.value = false;
           imageCodeModalVisible.value = false;
-          // lineModalVisible.value = true;
+          lineModalVisible.value = true;
           confirmOrderId.value = data.content;
-          // queryLineCount();
+          queryLineCount();
         } else {
           notification.error({description: data.message});
         }
@@ -420,17 +435,17 @@ export default defineComponent({
             let result = data.content;
             switch (result) {
               case -1 :
-                notification.success({description: "购票成功！"});
+                notification.success({description: "购票成功"});
                 lineModalVisible.value = false;
                 clearInterval(queryLineCountInterval);
                 break;
               case -2:
-                notification.error({description: "购票失败！"});
+                notification.error({description: "购票失败"});
                 lineModalVisible.value = false;
                 clearInterval(queryLineCountInterval);
                 break;
               case -3:
-                notification.error({description: "抱歉，没票了！"});
+                notification.error({description: "当日车次车票已售罄"});
                 lineModalVisible.value = false;
                 clearInterval(queryLineCountInterval);
                 break;
