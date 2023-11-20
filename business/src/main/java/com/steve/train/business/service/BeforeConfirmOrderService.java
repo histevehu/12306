@@ -80,6 +80,7 @@ public class BeforeConfirmOrderService {
         confirmOrder.setTickets(JSON.toJSONString(tickets));
         confirmOrderMapper.insert(confirmOrder);
         // 发送MQ排队购票
+        // MQ内消息代表指定日期车次的订单来了，等待处理。待分配到消费者后，对该消息指定的日期车次的订单循环逐张出票，直到所有订单处理完毕
         ConfirmOrderMQDTO confirmOrderMQDTO = new ConfirmOrderMQDTO();
         confirmOrderMQDTO.setDate(req.getDate());
         confirmOrderMQDTO.setTrainCode(req.getTrainCode());

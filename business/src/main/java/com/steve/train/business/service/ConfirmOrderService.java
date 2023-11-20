@@ -10,10 +10,12 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.steve.train.business.controller.RedisController;
 import com.steve.train.business.domain.*;
+import com.steve.train.business.dto.ConfirmOrderMQDTO;
 import com.steve.train.business.enums.ConfirmOrderStatusEnum;
 import com.steve.train.business.enums.RedisKeyTypeEnum;
 import com.steve.train.business.enums.SeatTypeEnum;
@@ -120,16 +122,20 @@ public class ConfirmOrderService {
         confirmOrderMapper.deleteByPrimaryKey(id);
     }
 
-    // TODO:省略业务数据校验，如：车次是否存在、余票是否存在、车次是否在有效期内、tickets条数>0
-    // TODO:省略同乘客同车次是否已经买过
+    /**
+     * 出票业务流程。
+     * 注意：当一个消费者拿到了某个车次锁，则该车次下所有的票都由他来出，一张一张出，直到所有的订单都出完
+     *
+     * @param dto
+     */
     @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
-    public void doConfirm(ConfirmOrderDoReq req) {
+    public void doConfirm(ConfirmOrderMQDTO dto) {
         // 由于使用MQ异步处理启用了新的线程，所以原服务中的事件流水号不会自动传递过来，需要通过req对象传递
         // 同理，若使用Spring自带的@Async，也需要手动传递事件流水号
-        MDC.put("LOG_ID", req.getLogId());
-        LOG.info("异步出票开始：{}", req);
+        MDC.put("LOG_ID", dto.getLogId());
+        LOG.info("异步出票开始：{}", dto);
         // 为该日期该车次生成Redis分布式锁key
-        String dlConfirmKey = RedisKeyTypeEnum.DL_CONFIRM_ORDER.getCode() + "-" + DateUtil.formatDate(req.getDate()) + "-" + req.getTrainCode();
+        String dlConfirmKey = RedisKeyTypeEnum.DL_CONFIRM_ORDER.getCode() + "-" + DateUtil.formatDate(dto.getDate()) + "-" + dto.getTrainCode();
         // 获取基本的Redis分布锁
         /* Boolean redisDL = redisTemplate.opsForValue().setIfAbsent(dlKey, dlKey, 60, TimeUnit.SECONDS);
         if (Boolean.TRUE.equals(redisDL)) {
@@ -174,93 +180,28 @@ public class ConfirmOrderService {
             ...后续代码同看门狗方案
             */
 
+        // 本消费者获得了该车次的购票分布锁，代表其拥有了售卖该日期车次的权限。无论有多少订单，都由本消费者来处理
         try {
-            Date date = req.getDate();
-            String trainCode = req.getTrainCode();
-            String start = req.getStart();
-            String end = req.getEnd();
-            // 从数据库里查出状态初始订单
-            ConfirmOrderExample confirmOrderExample = new ConfirmOrderExample();
-            confirmOrderExample.setOrderByClause("id asc");
-            ConfirmOrderExample.Criteria criteria = confirmOrderExample.createCriteria();
-            criteria.andDateEqualTo(req.getDate())
-                    .andTrainCodeEqualTo(req.getTrainCode())
-                    .andMemberIdEqualTo(req.getMemberId())
-                    .andStatusEqualTo(ConfirmOrderStatusEnum.INIT.getCode());
-            List<ConfirmOrder> list = confirmOrderMapper.selectByExampleWithBLOBs(confirmOrderExample);
-            ConfirmOrder confirmOrder;
-            if (CollUtil.isEmpty(list)) {
-                LOG.info("找不到原始订单，结束");
-                return;
-            } else {
-                LOG.info("本次处理{}条确认订单", list.size());
-                confirmOrder = list.get(0);
-            }
-            // 查出余票记录，需要得到真实的库存
-            DailyTrainTicket dailyTrainTicket = dailyTrainTicketService.selectByUnique(date, trainCode, start, end);
-            LOG.info("查出余票记录：{}", dailyTrainTicket);
-
-            // 扣减余票数量，并判断余票是否足够
-            reduceTickets(req, dailyTrainTicket);
-
-            // 计算相对于第一个座位的偏移值
-            // 比如选择的是c1,d2，则偏移值是：[0,5]
-            // 比如选择的是a1,b1,c1，则偏移值是：[0,1,2]
-            List<ConfirmOrderTicketReq> tickets = req.getTickets();
-            List<DailyTrainSeat> finalSeatList = new ArrayList<>();
-            ConfirmOrderTicketReq ticketReq0 = tickets.get(0);
-            // 因为如果选座则该订单所有购票都为选座，所以通过第一张票的选座字段是否为空可以判断该订单的所有车票是否为选座票
-            if (StrUtil.isNotBlank(ticketReq0.getSeat())) {
-                LOG.info("本次购票有选座");
-                // 查出本次选座的座位类型都有哪些列，用于计算所选座位与第一个座位的偏离值
-                List<SeatColEnum> colEnumList = SeatColEnum.getColsByType(ticketReq0.getSeatTypeCode());
-                LOG.info("本次选座的座位类型包含的列：{}", colEnumList);
-                // 组成和前端两排选座一样的列表，用于作参照的座位列表，例：referSeatList = {A1, C1, D1, F1, A2, C2, D2, F2}
-                List<String> referSeatList = new ArrayList<>();
-                for (int i = 1; i <= 2; i++) {
-                    for (SeatColEnum seatColEnum : colEnumList) {
-                        referSeatList.add(seatColEnum.getCode() + i);
-                    }
+            // 循环处理订单。该车次下所有的票都由本消费者来出，一张一张出，直到所有的订单都出完
+            while (true) {
+                // 查询确认订单表中指定日期&指定车次&处于初始状态的订单记录，
+                ConfirmOrderExample confirmOrderExample = new ConfirmOrderExample();
+                confirmOrderExample.setOrderByClause("id asc");
+                ConfirmOrderExample.Criteria criteria = confirmOrderExample.createCriteria();
+                criteria.andDateEqualTo(dto.getDate())
+                        .andTrainCodeEqualTo(dto.getTrainCode())
+                        .andStatusEqualTo(ConfirmOrderStatusEnum.INIT.getCode());
+                // 分页处理，每次取N条。后端处理大批量数据的常用做法，使用分页处理，而不是一次性查到内存里。
+                PageHelper.startPage(1, 5);
+                List<ConfirmOrder> list = confirmOrderMapper.selectByExampleWithBLOBs(confirmOrderExample);
+                if (CollUtil.isEmpty(list)) {
+                    LOG.info("没有需要处理的订单，结束循环");
+                    break;
+                } else {
+                    LOG.info("本次处理{}条订单", list.size());
                 }
-                LOG.info("用于作参照的两排座位：{}", referSeatList);
-
-                List<Integer> offsetList = new ArrayList<>();
-                // 绝对偏移值，即：在参照座位列表中的位置
-                List<Integer> aboluteOffsetList = new ArrayList<>();
-                for (ConfirmOrderTicketReq ticketReq : tickets) {
-                    int index = referSeatList.indexOf(ticketReq.getSeat());
-                    aboluteOffsetList.add(index);
-                }
-                LOG.info("计算得到所有座位的绝对偏移值：{}", aboluteOffsetList);
-                for (Integer index : aboluteOffsetList) {
-                    int offset = index - aboluteOffsetList.get(0);
-                    offsetList.add(offset);
-                }
-                LOG.info("计算得到所有座位的相对第一个座位的偏移值：{}", offsetList);
-                // 选座
-                // 一个车箱一个车箱的获取座位数据
-                // 挑选符合条件的座位，如果这个车箱不满足，则进入下个车箱（多个选座应该在同一个车厢内）
-                getSeat(finalSeatList, date, trainCode, ticketReq0.getSeatTypeCode(), ticketReq0.getSeat().split("")[0], // 第一个座位的列名，如从A1得到A
-                        offsetList, dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex());
-
-            } else {
-                LOG.info("本次购票没有选座");
-                for (ConfirmOrderTicketReq ticketReq : tickets) {
-                    getSeat(finalSeatList, date, trainCode, ticketReq.getSeatTypeCode(), null, null, dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex());
-                }
-            }
-            LOG.info("最终选座：{}", finalSeatList);
-
-            // 选中座位后事务处理：
-            // 座位表修改售卖情况sell；
-            // 余票详情表修改余票；
-            // 为会员增加购票记录
-            // 更新确认订单为成功
-            try {
-                afterConfirmOrderService.afterDoConfirm(dailyTrainTicket, finalSeatList, tickets, confirmOrder);
-            } catch (Exception e) {
-                LOG.error("保存购票信息失败", e);
-                throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_EXCEPTION);
+                // 逐条地卖
+                list.forEach(this::sell);
             }
         } finally {
             // 当分布锁非空且为当前线程所持有时，释放锁
@@ -281,6 +222,115 @@ public class ConfirmOrderService {
         throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_FLOW_EXCEPTION);
     }
 
+    /**
+     * 售票
+     */
+    // TODO:省略业务数据校验，如：车次是否存在、余票是否存在、车次是否在有效期内、tickets条数>0
+    // TODO:省略同乘客同车次是否已经买过
+    private void sell(ConfirmOrder confirmOrder) {
+        // 构造ConfirmOrderDoReq
+        ConfirmOrderDoReq req = new ConfirmOrderDoReq();
+        req.setMemberId(confirmOrder.getMemberId());
+        req.setDate(confirmOrder.getDate());
+        req.setTrainCode(confirmOrder.getTrainCode());
+        req.setStart(confirmOrder.getStart());
+        req.setEnd(confirmOrder.getEnd());
+        req.setDailyTrainTicketId(confirmOrder.getDailyTrainTicketId());
+        req.setTickets(JSON.parseArray(confirmOrder.getTickets(), ConfirmOrderTicketReq.class));
+        req.setImageCode("");
+        req.setImageCodeToken("");
+        req.setLogId("");
+        // 将确认订单的状态更新为处理中，避免重复处理
+        confirmOrder.setStatus(ConfirmOrderStatusEnum.PENDING.getCode());
+        updateStatus(confirmOrder);
+        LOG.info("confirm_order[{}]状态更新为处理中", confirmOrder.getId());
+
+        Date date = req.getDate();
+        String trainCode = req.getTrainCode();
+        String start = req.getStart();
+        String end = req.getEnd();
+        // 查出余票记录，需要得到真实的库存
+        DailyTrainTicket dailyTrainTicket = dailyTrainTicketService.selectByUnique(date, trainCode, start, end);
+        LOG.info("查出余票记录：{}", dailyTrainTicket);
+
+        // 扣减余票数量，并判断余票是否足够
+        reduceTickets(req, dailyTrainTicket);
+
+        // 计算相对于第一个座位的偏移值
+        // 比如选择的是c1,d2，则偏移值是：[0,5]
+        // 比如选择的是a1,b1,c1，则偏移值是：[0,1,2]
+        List<ConfirmOrderTicketReq> tickets = req.getTickets();
+        List<DailyTrainSeat> finalSeatList = new ArrayList<>();
+        ConfirmOrderTicketReq ticketReq0 = tickets.get(0);
+        // 因为如果选座则该订单所有购票都为选座，所以通过第一张票的选座字段是否为空可以判断该订单的所有车票是否为选座票
+        if (StrUtil.isNotBlank(ticketReq0.getSeat())) {
+            LOG.info("本次购票有选座");
+            // 查出本次选座的座位类型都有哪些列，用于计算所选座位与第一个座位的偏离值
+            List<SeatColEnum> colEnumList = SeatColEnum.getColsByType(ticketReq0.getSeatTypeCode());
+            LOG.info("本次选座的座位类型包含的列：{}", colEnumList);
+            // 组成和前端两排选座一样的列表，用于作参照的座位列表，例：referSeatList = {A1, C1, D1, F1, A2, C2, D2, F2}
+            List<String> referSeatList = new ArrayList<>();
+            for (int i = 1; i <= 2; i++) {
+                for (SeatColEnum seatColEnum : colEnumList) {
+                    referSeatList.add(seatColEnum.getCode() + i);
+                }
+            }
+            LOG.info("用于作参照的两排座位：{}", referSeatList);
+
+            List<Integer> offsetList = new ArrayList<>();
+            // 绝对偏移值，即：在参照座位列表中的位置
+            List<Integer> aboluteOffsetList = new ArrayList<>();
+            for (ConfirmOrderTicketReq ticketReq : tickets) {
+                int index = referSeatList.indexOf(ticketReq.getSeat());
+                aboluteOffsetList.add(index);
+            }
+            LOG.info("计算得到所有座位的绝对偏移值：{}", aboluteOffsetList);
+            for (Integer index : aboluteOffsetList) {
+                int offset = index - aboluteOffsetList.get(0);
+                offsetList.add(offset);
+            }
+            LOG.info("计算得到所有座位的相对第一个座位的偏移值：{}", offsetList);
+            // 选座
+            // 一个车箱一个车箱的获取座位数据
+            // 挑选符合条件的座位，如果这个车箱不满足，则进入下个车箱（多个选座应该在同一个车厢内）
+            getSeat(finalSeatList, date, trainCode, ticketReq0.getSeatTypeCode(), ticketReq0.getSeat().split("")[0], // 第一个座位的列名，如从A1得到A
+                    offsetList, dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex());
+
+        } else {
+            LOG.info("本次购票没有选座");
+            for (ConfirmOrderTicketReq ticketReq : tickets) {
+                getSeat(finalSeatList, date, trainCode, ticketReq.getSeatTypeCode(), null, null, dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex());
+            }
+        }
+        LOG.info("最终选座：{}", finalSeatList);
+
+        // 选中座位后事务处理：
+        // 座位表修改售卖情况sell；
+        // 余票详情表修改余票；
+        // 为会员增加购票记录
+        // 更新确认订单为成功
+        try {
+            afterConfirmOrderService.afterDoConfirm(dailyTrainTicket, finalSeatList, tickets, confirmOrder);
+        } catch (Exception e) {
+            LOG.error("保存购票信息失败", e);
+            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_EXCEPTION);
+        }
+    }
+
+    /**
+     * 更新订单状态
+     */
+    public void updateStatus(ConfirmOrder confirmOrder) {
+        ConfirmOrder confirmOrderForUpdate = new ConfirmOrder();
+        confirmOrderForUpdate.setId(confirmOrder.getId());
+        confirmOrderForUpdate.setUpdateTime(new Date());
+        confirmOrderForUpdate.setStatus(confirmOrder.getStatus());
+        confirmOrderMapper.updateByPrimaryKeySelective(confirmOrderForUpdate);
+    }
+
+    /**
+     * 扣减余票
+     */
     private static void reduceTickets(ConfirmOrderDoReq req, DailyTrainTicket dailyTrainTicket) {
         for (ConfirmOrderTicketReq ticketReq : req.getTickets()) {
             String seatTypeCode = ticketReq.getSeatTypeCode();
