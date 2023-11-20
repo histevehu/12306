@@ -141,13 +141,16 @@ public class SkTokenService {
         LOG.info("会员【{}】获取日期【{}】车次【{}】的令牌开始", memberId, DateUtil.formatDate(date), trainCode);
         // 获取令牌锁，若令牌锁已存在说明用户10秒内发起过请求，令牌获取失败
         // SKToken就是令牌，用来表示【谁能做什么】的一个凭证，包含日期、车次、用户ID，有效期10秒钟，即每个用户每隔10秒钟才能发起一次购票请求，防止刷票
+        // 若为开发环境则跳过获取令牌锁
         String SKToken_Key = RedisKeyTypeEnum.DL_SK_TOKEN.getCode() + "-" + DateUtil.formatDate(date) + "-" + trainCode + "-" + memberId;
-        Boolean setIfAbsent = redisTemplate.opsForValue().setIfAbsent(SKToken_Key, SKToken_Key, 10, TimeUnit.SECONDS);
-        if (Boolean.TRUE.equals(setIfAbsent)) {
-            LOG.info("成功抢占令牌锁   SKToken_Key：{}", SKToken_Key);
-        } else {
-            LOG.info("抢占令牌锁失败   SKToken_Key：{}", SKToken_Key);
-            return null;
+        if (!env.equals("dev")) {
+            Boolean setIfAbsent = redisTemplate.opsForValue().setIfAbsent(SKToken_Key, SKToken_Key, 10, TimeUnit.SECONDS);
+            if (Boolean.TRUE.equals(setIfAbsent)) {
+                LOG.info("成功抢占令牌锁   SKToken_Key：{}", SKToken_Key);
+            } else {
+                LOG.info("抢占令牌锁失败   SKToken_Key：{}", SKToken_Key);
+                return null;
+            }
         }
         // 校验令牌余量
         String skTokenCountKey = RedisKeyTypeEnum.SK_TOKEN_COUNT.getCode() + "-" + DateUtil.formatDate(date) + "-" + trainCode;

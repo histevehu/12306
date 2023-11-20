@@ -162,10 +162,9 @@ public class ConfirmOrderService {
         if (watchDogLock) {
             LOG.info("看门狗获得购票分布锁成功");
         } else {
-            // 只是没抢到锁，并不知道票抢完了没，所以提示稍候再试
-            // LOG.info("很遗憾，没抢到锁！lockKey：{}", lockKey);
-            LOG.warn("看门狗获得购票分布锁失败");
-            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_LOCK_FAIL);
+            LOG.warn("看门狗获得购票分布锁失败，有其它消费线程正在出票，不做任何处理");
+            // 不必抛出异常，因为MQ消费者抛出异常没有对应处理方法，没有意义
+            return;
         }
 
         // 问题2：Redis集群宕机，不同的请求在新老结点中都获取到了锁
@@ -201,7 +200,20 @@ public class ConfirmOrderService {
                     LOG.info("本次处理{}条订单", list.size());
                 }
                 // 逐条地卖
-                list.forEach(this::sell);
+                list.forEach(confirmOrder -> {
+                    // 即使该订单出票出现异常，也不能影响处理下一个订单
+                    try {
+                        sell(confirmOrder);
+                    } catch (BusinessException e) {
+                        if (e.getE().equals(BusinessExceptionEnum.CONFIRM_ORDER_TICKET_COUNT_ERROR)) {
+                            LOG.info("本订单余票不足，继续售卖下一个订单");
+                            confirmOrder.setStatus(ConfirmOrderStatusEnum.EMPTY.getCode());
+                            updateStatus(confirmOrder);
+                        } else {
+                            throw e;
+                        }
+                    }
+                });
             }
         } finally {
             // 当分布锁非空且为当前线程所持有时，释放锁
