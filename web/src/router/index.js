@@ -36,12 +36,6 @@ const routes = [{
         }, {
             path: 'myticket',
             component: () => import('../views/ConsoleSubViews/MyTicketView.vue')
-        }, {
-            path: 'seat',
-            component: () => import('../views/ConsoleSubViews/SeatView.vue')
-        }, {
-            path: 'admin',
-            component: () => import('../views/ConsoleSubViews/AdminView.vue')
         }]
 }]
 

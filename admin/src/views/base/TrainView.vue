@@ -80,12 +80,11 @@ import {defineComponent, onMounted, ref, watch} from 'vue';
 import {notification} from "ant-design-vue";
 import axios from "axios";
 import {pinyin} from "pinyin-pro";
-import TrainSelectView from "@/components/TrainSelect.vue";
 import StationSelectView from "@/components/StationSelect.vue";
 
 export default defineComponent({
   name: "TrainView",
-  components: {StationSelectView, TrainSelectView},
+  components: {StationSelectView},
   setup() {
     const TRAIN_TYPE_ARRAY = window.TRAIN_TYPE_ARRAY;
     const visible = ref(false);

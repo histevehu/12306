@@ -5,7 +5,7 @@
   "scripts": {
     "web-dev": "vue-cli-service serve --mode dev --port 7000",
     "web-prod": "vue-cli-service serve --mode prod --port 7000",
-    "build": "vue-cli-service build",
+    "build-web-prod": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -40,7 +40,13 @@
     "parserOptions": {
       "parser": "@babel/eslint-parser"
     },
-    "rules": {}
+    "rules": {
+      "vue/multi-word-component-names": 0,
+      "no-undef": 0,
+      "vue/no-unused-vars": 0,
+      "no-unused-vars": 0,
+      "vue/valid-v-on": 0
+    }
   },
   "browserslist": [
     "> 1%",

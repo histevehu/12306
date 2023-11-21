@@ -27,7 +27,7 @@ public class JWTUtil {
 
     public static String createToken(Long id, String mobile) {
         LOG.info("开始生成JWT，id：{}，mobile：{}", id, mobile);
-        // BouncyCastle类是一个加密的第三方类，关闭它使用jdk自带的加密算法
+        // BouncyCastle类是hutool引用的一个加密的第三方类，如果将应用打包部署到服务器，其会检测到被再次打包，签名验证失败而发生错误，所以关闭它使用jdk自带的加密算法
         GlobalBouncyCastleProvider.setUseBouncyCastle(false);
         DateTime now = DateTime.now();
         // 设置JWT token过期时间
