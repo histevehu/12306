@@ -21,6 +21,8 @@ import org.springframework.core.env.Environment;
 // Spring内置缓存，需要配合具体的服务上加@cacheable一起使用
 // Spring内置缓存可以解决MyBatis二级缓存需要修改mapper的问题，但同样存在多个节点缓存不一致的问题
 @EnableCaching
+// 单机学习也使用Spring自带异步线程以替代MQ，需要配合具体的服务方法上加@Async一起使用
+// @EnableAsync
 public class BusinessApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(BusinessApplication.class);

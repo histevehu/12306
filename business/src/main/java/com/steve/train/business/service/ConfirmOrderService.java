@@ -129,8 +129,11 @@ public class ConfirmOrderService {
      * @param dto
      */
     @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
+    // 单机学习也使用Spring自带异步线程以替代MQ
+    // 注意：和@Transactional一样，必须是外部类调用本方法才可生效，因为@Async注解会生成一个代理类，而只有当外部类调用才会生成，内部类调用本方法无效
+    // @Async
     public void doConfirm(ConfirmOrderMQDTO dto) {
-        // 由于使用MQ异步处理启用了新的线程，所以原服务中的事件流水号不会自动传递过来，需要通过req对象传递
+        // 若使用@Async或MQ异步处理启用了新的线程，原服务中的事件流水号不会自动传递过来，需要通过req对象传递
         // 同理，若使用Spring自带的@Async，也需要手动传递事件流水号
         MDC.put("LOG_ID", dto.getLogId());
         LOG.info("异步出票开始：{}", dto);
