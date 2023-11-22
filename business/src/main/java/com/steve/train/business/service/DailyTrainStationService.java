@@ -125,4 +125,12 @@ public class DailyTrainStationService {
         example.createCriteria().andDateEqualTo(date).andTrainCodeEqualTo(trainCode);
         return dailyTrainStationMapper.countByExample(example);
     }
+
+    public List<DailyTrainStationQueryResp> queryByTrain(Date date, String trainCode) {
+        DailyTrainStationExample dailyTrainStationExample = new DailyTrainStationExample();
+        dailyTrainStationExample.setOrderByClause("`index` asc");
+        dailyTrainStationExample.createCriteria().andDateEqualTo(date).andTrainCodeEqualTo(trainCode);
+        List<DailyTrainStation> list = dailyTrainStationMapper.selectByExample(dailyTrainStationExample);
+        return BeanUtil.copyToList(list, DailyTrainStationQueryResp.class);
+    }
 }
