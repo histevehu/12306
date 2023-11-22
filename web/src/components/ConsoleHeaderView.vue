@@ -36,16 +36,6 @@
           <idcard-outlined/> &nbsp; 我的车票
         </router-link>
       </a-menu-item>
-      <a-menu-item key="/seat">
-        <router-link to="/seat">
-          <usergroup-add-outlined/> &nbsp; 座位销售图
-        </router-link>
-      </a-menu-item>
-      <a-menu-item key="/admin">
-        <router-link to="/admin">
-          <desktop-outlined/> &nbsp; 控制台管理
-        </router-link>
-      </a-menu-item>
     </a-menu>
   </a-layout-header>
 </template>

@@ -19,19 +19,7 @@
           <a-button type="primary" @click="toOrder(record)" :disabled="isExpire(record)">
             {{ isExpire(record) ? "过期" : "预订" }}
           </a-button>
-          <router-link :to="{
-            path: '/seat',
-            query: {
-              date: record.date,
-              trainCode: record.trainCode,
-              start: record.start,
-              startIndex: record.startIndex,
-              end: record.end,
-              endIndex: record.endIndex
-            }
-          }">
-            <a-button type="primary">座位销售图</a-button>
-          </router-link>
+          <a-button type="primary" @click="showSellSeat(record)">座位销售图</a-button>
           <a-button type="primary" @click="showStation(record)">途经车站</a-button>
         </a-space>
       </template>
@@ -90,7 +78,60 @@
       </template>
     </template>
   </a-table>
+  <!--座位销售图-->
+  <a-modal style="top: 30px" v-model:visible="sellSeatVisible" :title="座位销售图" :footer="null" :closable="false">
+    <p style="font-weight: bold;">
+      日期：{{ seatSellQueryParam.date }}，车次：{{ seatSellQueryParam.trainCode }}，出发站：{{
+        seatSellQueryParam.start
+      }}，到达站：{{ seatSellQueryParam.end }}
+    </p>
 
+    <table>
+      <tr>
+        <td style="width: 25px; background: #FF9900;"></td>
+        <td>：已被购买</td>
+        <td style="width: 20px;"></td>
+        <td style="width: 25px; background: #999999;"></td>
+        <td>：未被购买</td>
+      </tr>
+    </table>
+    <br>
+    <div v-for="(seatObj, carriage) in trainSeatSell" :key="carriage"
+         style="border: 3px solid #99CCFF;
+                 margin-bottom: 30px;
+                 padding: 5px;
+                 border-radius: 4px">
+      <div style="display:block;
+                  width:50px;
+                  height:10px;
+                  position:relative;
+                  top:-15px;
+                  text-align: center;
+                  background: white;">
+        {{ carriage }}
+      </div>
+      <table>
+        <tr>
+          <td v-for="(sell, index) in Object.values(seatObj)[0]" :key="index"
+              style="text-align: center">
+            {{ index + 1 }}
+          </td>
+        </tr>
+        <tr v-for="(sellList, col) in seatObj" :key="col">
+          <!--若该日期车次指定范围段的sell>0，则显示已被购买，否则显示未被购买-->
+          <td v-for="(sell, index) in sellList" :key="index"
+              style="text-align: center;
+                      border: 2px solid white;
+                      background: grey;
+                      padding: 0 4px;
+                      color: white;
+                      "
+              :style="{background: (sell > 0 ? '#FF9900' : '#999999')}">{{ col }}
+          </td>
+        </tr>
+      </table>
+    </div>
+  </a-modal>
   <!-- 途经车站 -->
   <a-modal style="top: 30px" v-model:visible="visible" :title="null" :footer="null" :closable="false">
     <a-table :data-source="stations" :pagination="false">
@@ -128,6 +169,8 @@ export default defineComponent({
   components: {StationSelectView},
   setup() {
     const visible = ref(false);
+    const sellSeatVisible = ref(false);
+    const seatSellList = ref();
     let dailyTrainTicket = ref({
       id: undefined,
       date: undefined,
@@ -291,6 +334,62 @@ export default defineComponent({
       });
     };
 
+    const seatSellQueryParam = ref({});
+    const showSellSeat = (record) => {
+      sellSeatVisible.value = true;
+      seatSellQueryParam.value = {
+        date: record.date,
+        trainCode: record.trainCode,
+        start: record.start,
+        startIndex: record.startIndex,
+        end: record.end,
+        endIndex: record.endIndex
+      };
+      axios.get("/business/seatSell/query", {
+        params: seatSellQueryParam.value
+      }).then((response) => {
+        let data = response.data;
+        if (data.success) {
+          seatSellList.value = data.content;
+          format(seatSellQueryParam.value);
+        } else {
+          notification.error({description: data.message});
+        }
+      });
+    };
+
+    const trainSeatSell = ref({});
+    const format = (param) => {
+      let _train = {};
+      for (let i = 0; i < seatSellList.value.length; i++) {
+        let item = seatSellList.value[i];
+        // 计算当前区间是否还有票，约定：站序是从0开始
+        let sellDB = item.sell;
+        // 假设6站：start = 1, end = 3, sellDB = 11111，最终得到：sell = 01110，转int 1100，不可买
+        // 假设6站：start = 1, end = 3, sellDB = 11011，最终得到：sell = 01010，转int 1000，不可买
+        // 假设6站：start = 1, end = 3, sellDB = 10001，最终得到：sell = 00000，转int 0，可买
+        // 验证代码：
+        // let sellDB = "123456789";
+        // let start = 1;
+        // let end = 3;
+        // let sell = sellDB.substr(start, end - start)
+        // console.log(sell)
+        let sell = sellDB.substr(param.startIndex, param.endIndex - param.startIndex);
+        // console.log("完整的销卖信息：", sellDB, "区间内的销卖信息", sell);
+        // 将sell放入火车数据中
+        if (!_train["车箱" + item.carriageIndex]) {
+          _train["车箱" + item.carriageIndex] = {};
+        }
+        if (!_train["车箱" + item.carriageIndex][item.col]) {
+          _train["车箱" + item.carriageIndex][item.col] = [];
+        }
+        _train["车箱" + item.carriageIndex][item.col].push(parseInt(sell));
+      }
+      trainSeatSell.value = _train;
+      console.log(_train)
+    }
+
+
     // 不能选择今天以前及两周以后的日期
     const disabledDate = current => {
       return current && (current <= dayjs().add(-1, 'day') || current > dayjs().add(14, 'day'));
@@ -324,6 +423,8 @@ export default defineComponent({
     return {
       dailyTrainTicket,
       visible,
+      sellSeatVisible,
+      seatSellQueryParam,
       dailyTrainTickets,
       pagination,
       columns,
@@ -334,9 +435,11 @@ export default defineComponent({
       calDuration,
       toOrder,
       showStation,
+      showSellSeat,
       stations,
       disabledDate,
-      isExpire
+      isExpire,
+      trainSeatSell
     };
   },
 });

@@ -5,8 +5,8 @@
         mode="inline"
         :style="{ height: '100%', borderRight: 0 }"
     >
-      <a-menu-item key="/">
-        <router-link to="/">
+      <a-menu-item key="/welcome">
+        <router-link to="/welcome">
           <coffee-outlined/> &nbsp; 欢迎
         </router-link>
       </a-menu-item>
@@ -23,16 +23,6 @@
       <a-menu-item key="/myticket">
         <router-link to="/myticket">
           <idcard-outlined/> &nbsp; 我的车票
-        </router-link>
-      </a-menu-item>
-      <a-menu-item key="/seat">
-        <router-link to="/seat">
-          <usergroup-add-outlined/> &nbsp; 座位销售图
-        </router-link>
-      </a-menu-item>
-      <a-menu-item key="/admin">
-        <router-link to="/admin">
-          <desktop-outlined/> &nbsp; 控制台管理
         </router-link>
       </a-menu-item>
     </a-menu>
