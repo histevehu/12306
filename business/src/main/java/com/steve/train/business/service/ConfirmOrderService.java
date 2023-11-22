@@ -559,4 +559,19 @@ public class ConfirmOrderService {
         };
     }
 
+    /**
+     * 取消排队，只有I（初始）状态才能取消排队，所以按状态更新
+     *
+     * @param id 订单ID
+     * @return 返回影响的数据条数
+     */
+    public Integer cancel(Long id) {
+        ConfirmOrderExample confirmOrderExample = new ConfirmOrderExample();
+        ConfirmOrderExample.Criteria criteria = confirmOrderExample.createCriteria();
+        criteria.andIdEqualTo(id).andStatusEqualTo(ConfirmOrderStatusEnum.INIT.getCode());
+        ConfirmOrder confirmOrder = new ConfirmOrder();
+        confirmOrder.setStatus(ConfirmOrderStatusEnum.CANCEL.getCode());
+        return confirmOrderMapper.updateByExampleSelective(confirmOrder, confirmOrderExample);
+    }
+
 }
