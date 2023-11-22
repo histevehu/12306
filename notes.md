@@ -47,7 +47,7 @@ Springboot本地缓存可以解决MyBatis二级缓存需要修改mapper的问题
 
 可通过配置`spring.cache.type=redis`参数，将Spring缓存存放到Redis上。使用 Redis 存放缓存解决了两个问题：
 
-- 提高访问速度， mysq |单机 QPS 约为 2000 ， redis 约 10 万
+- 提高访问速度， mysql单机 QPS 约为 2000 ， redis 约 10 万
 - 解决多节点共享缓存，机器重启也不会丢缓存数据
 
 Redis 常用于放用户的登录信息，早期没有 redis 时，登录信息都放在 session中，应用一重启，登录就没有了，多节点 session 又是另一个头大的问题
