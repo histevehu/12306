@@ -8,8 +8,12 @@ import com.github.pagehelper.PageInfo;
 import com.steve.train.common.context.MemberLoginContext;
 import com.steve.train.common.resp.PageResp;
 import com.steve.train.common.util.SnowFlakeUtil;
+import com.steve.train.member.domain.Member;
+import com.steve.train.member.domain.MemberExample;
 import com.steve.train.member.domain.Passenger;
 import com.steve.train.member.domain.PassengerExample;
+import com.steve.train.member.enums.PassengerTypeEnum;
+import com.steve.train.member.mapper.MemberMapper;
 import com.steve.train.member.mapper.PassengerMapper;
 import com.steve.train.member.req.PassengerQueryReq;
 import com.steve.train.member.req.PassengerSaveReq;
@@ -19,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /*
@@ -31,6 +37,8 @@ public class PassengerService {
 
     @Resource
     private PassengerMapper passengerMapper;
+    @Resource
+    private MemberMapper memberMapper;
 
     private final static Logger LOG = LoggerFactory.getLogger(PassengerService.class);
 
@@ -102,5 +110,40 @@ public class PassengerService {
         criteria.andMemberIdEqualTo(MemberLoginContext.getId());
         List<Passenger> list = passengerMapper.selectByExample(passengerExample);
         return BeanUtil.copyToList(list, PassengerQueryResp.class);
+    }
+
+
+    /**
+     * 初始化若干NPC乘客，防止上线体验时乘客被删光
+     */
+    public void init() {
+        DateTime now = DateTime.now();
+        MemberExample memberExample = new MemberExample();
+        // 18000000000用户是默认用户，用于开发测试跑批
+        memberExample.createCriteria().andMobileEqualTo("18000000000");
+        List<Member> memberList = memberMapper.selectByExample(memberExample);
+        Member member = memberList.get(0);
+        List<Passenger> passengerList = new ArrayList<>();
+        List<String> nameList = Arrays.asList("NPC_1", "NPC_2", "NPC_3");
+        for (String s : nameList) {
+            Passenger passenger = new Passenger();
+            passenger.setId(SnowFlakeUtil.getSnowFlakeNextId());
+            passenger.setMemberId(member.getId());
+            passenger.setName(s);
+            passenger.setIdCard("123456789123456789");
+            passenger.setType(PassengerTypeEnum.ADULT.getCode());
+            passenger.setCreateTime(now);
+            passenger.setUpdateTime(now);
+            passengerList.add(passenger);
+        }
+        // 若NPC用户不存在，则新增
+        for (Passenger passenger : passengerList) {
+            PassengerExample passengerExample = new PassengerExample();
+            passengerExample.createCriteria().andNameEqualTo(passenger.getName());
+            long l = passengerMapper.countByExample(passengerExample);
+            if (l == 0) {
+                passengerMapper.insert(passenger);
+            }
+        }
     }
 }

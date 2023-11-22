@@ -9,11 +9,10 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import javax.sql.DataSource;
 import java.io.IOException;
 
-@Configuration
-
 /**
- * Quartz数据库模式动态管理定时调度任务触发器，需要配合JobFactory类使用
+ * Quartz数据库模式动态管理定时调度任务触发器，需要配合{@link JobFactory}类使用
  */
+@Configuration
 public class SchedulerConfig {
 
     @Resource

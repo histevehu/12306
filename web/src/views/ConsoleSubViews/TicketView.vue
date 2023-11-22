@@ -391,8 +391,8 @@ export default defineComponent({
 
 
     // 不能选择今天以前及两周以后的日期
-    const disabledDate = current => {
-      return current && (current <= dayjs().add(-1, 'day') || current > dayjs().add(14, 'day'));
+    const disabledDate = appointedDate => {
+      return appointedDate && (appointedDate <= dayjs().add(-1, 'day') || appointedDate > dayjs().add(14, 'day'));
     };
 
     // 判断是否过期
